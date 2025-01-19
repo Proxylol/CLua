@@ -1,0 +1,1525 @@
+joaat = Utils.Joaat
+yield = Script.Yield
+qJob = Script.QueueJob
+function myHandle()
+	return GTA.PointerToHandle(CPhysical.FromAddress(GTA.GetLocalPed():GetAddress()))
+end
+allweaponCatsAndNames = {
+	--Assault Riffles:
+	["assault_rifles"] = {
+		{"weapon_assaultrifle", "Assault Rifle"},
+		{"weapon_assaultrifle_mk2", "Assault Rifle Mk II"},
+		{"weapon_bullpuprifle", "Bullpup Rifle"},
+		{"weapon_bullpuprifle_mk2", "Bullpup Rifle Mk II"},
+		{"weapon_carbinerifle", "Carbine Rifle"},
+		{"weapon_carbinerifle_mk2", "Carbine Rifle Mk II"},
+		{"weapon_compactrifle", "Compact Rifle"},
+		{"weapon_specialcarbine", "Special Carbine"},
+		{"weapon_specialcarbine_mk2", "Special Carbine Mk II"},
+		{"weapon_advancedrifle", "Advanced Rifle"},
+		{"weapon_heavyrifle", "Heavy Rifle"},
+		{"weapon_militaryrifle", "Military Rifle"},
+		{"weapon_tacticalrifle", "Service Rifle"}
+	},
+	--Sniper Rifles:
+	["sniper_rifles"] = {
+		{"weapon_sniperrifle", "Sniper Rifle"},
+		{"weapon_heavysniper", "Heavy Sniper"},
+		{"weapon_heavysniper_mk2", "Heavy Sniper Mk II"},
+		{"weapon_marksmanrifle", "Marksman Rifle"},
+		{"weapon_marksmanrifle_mk2", "Marksman Rifle Mk II"},
+		{"weapon_precisionrifle", "Precision Rifle"}
+	},
+	--Meele:
+	["melees"] = {
+		{"weapon_knife", "Knife"},
+		{"weapon_bat", "Baseball Bat"},
+		{"weapon_battleaxe", "Battle Axe"},
+		{"weapon_bottle", "Bottle"},
+		{"weapon_crowbar", "Crowbar"},
+		{"weapon_dagger", "Antique Cavalry Dagger"},
+		{"weapon_flashlight", "Flashlight"},
+		{"weapon_hammer", "Hammer"},
+		{"weapon_hatchet", "Hatchet"},
+		{"weapon_knuckle", "Knuckle Duster"},
+		{"weapon_machete", "Machete"},
+		{"weapon_nightstick", "Nightstick"},
+		{"weapon_poolcue", "Pool Cue"},
+		{"weapon_switchblade", "Switchblade"},
+		{"weapon_wrench", "Pipe Wrench"},
+		{"weapon_stone_hatchet", "Stone Hatchet"},
+		{"weapon_golfclub", "Golf Club"}
+	},
+	--Shotguns:
+	["shotguns"] = {
+		{"weapon_assaultshotgun", "Assault Shotgun"},
+		{"weapon_autoshotgun", "Sweeper Shotgun"},
+		{"weapon_bullpupshotgun", "Bullpup Shotgun"},
+		{"weapon_dbshotgun", "Double Barrel Shotgun"},
+		{"weapon_heavyshotgun", "Heavy Shotgun"},
+		{"weapon_pumpshotgun", "Pump Shotgun"},
+		{"weapon_pumpshotgun_mk2", "Pump Shotgun Mk II"},
+		{"weapon_sawnoffshotgun", "Sawed-Off Shotgun"},
+		{"weapon_musket", "Musket"}
+	},
+	--Heavy:
+	["heavys"] = {
+		{"weapon_compactlauncher", "Compact Grenade Launcher"},
+		{"weapon_firework", "Firework Launcher"},
+		{"weapon_grenadelauncher", "Grenade Launcher"},
+		{"weapon_hominglauncher", "Homing Launcher"},
+		{"weapon_minigun", "Minigun"},
+		{"weapon_railgun", "Railgun"},
+		{"weapon_rpg", "RPG"},
+		{"weapon_rayminigun", "Widowmaker"},
+		{"weapon_emplauncher", "Compact EMP Launcher"}
+	},
+	--Nades:
+	["nades"] = {
+		{"weapon_ball", "Ball"},
+		{"weapon_bzgas", "BZ Gas"},
+		{"weapon_flare", "Flare"},
+		{"weapon_grenade", "Grenade"},
+		{"weapon_molotov", "Molotov"},
+		{"weapon_pipebomb", "Pipe Bomb"},
+		{"weapon_proxmine", "Proximity Mine"},
+		{"weapon_smokegrenade", "Tear Gas"},
+		{"weapon_snowball", "Snowball"},
+		{"weapon_stickybomb", "Sticky Bomb"},
+		{"weapon_fireextinguisher", "Fire Extinguisher"},
+		{"weapon_hazardcan", "Hazard Can"},
+		{"weapon_petrolcan", "Jerry Can"}
+	},
+
+	--Pistols:
+	["pistols"] = {
+		{"weapon_appistol", "AP Pistol"},
+		{"weapon_combatpistol", "Combat Pistol"},
+		{"weapon_doubleaction", "Double-Action Revolver"},
+		{"weapon_flaregun", "Flare Gun"},
+		{"weapon_heavypistol", "Heavy Pistol"},
+		{"weapon_machinepistol", "Machine Pistol"}, -- smg?
+		{"weapon_pistol", "Pistol"},
+		{"weapon_pistol_mk2", "Pistol Mk II"},
+		{"weapon_pistol50", "Pistol .50"},
+		{"weapon_revolver", "Heavy Revolver"},
+		{"weapon_revolver_mk2", "Heavy Revolver Mk II"},
+		{"weapon_snspistol", "SNS Pistol"},
+		{"weapon_snspistol_mk2", "SNS Pistol Mk II"},
+		{"weapon_vintagepistol", "Vintage Pistol"},
+		{"weapon_marksmanpistol", "Marksman Pistol"},
+		{"weapon_raypistol", "Up-n-Atomizer"},
+		{"weapon_stungun", "Stun Gun"},
+		{"weapon_stungun_mp", "Stun Gun MP"},
+		{"weapon_metaldetector", "Metaldetector"},
+		{"weapon_digiscanner", "digiscanner"},	
+	},
+	--LMGs
+	["s_l_mgs"] = {
+		{"weapon_combatmg", "Combat MG"},
+		{"weapon_combatmg_mk2", "Combat MG Mk II"},
+		{"weapon_gusenberg", "Gusenberg Sweeper"},
+		{"weapon_mg", "MG"},
+		{"weapon_raycarbine", "Unholy Hellbringer"},
+		--SMGs
+		{"weapon_assaultsmg", "Assault SMG"},
+		{"weapon_combatpdw", "Combat PDW"},		
+		{"weapon_microsmg", "Micro SMG"},
+		{"weapon_minismg", "Mini SMG"},
+		{"weapon_smg", "SMG"},
+		{"weapon_smg_mk2", "SMG Mk II"},
+		{"WEAPON_TECPISTOL", "Tactical SMG"}
+	}
+}
+
+allWeaponComponents = {
+	--WEAPON_TECPISTOL
+	{"COMPONENT_TECPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_TECPISTOL_CLIP_02", "Extended Clip"},
+
+	-- Knuckel
+	{"COMPONENT_KNUCKLE_VARMOD_BASE", "Base Model"},
+	{"COMPONENT_KNUCKLE_VARMOD_PIMP", "The Pimp"},
+	{"COMPONENT_KNUCKLE_VARMOD_BALLAS", "The Ballas"},
+	{"COMPONENT_KNUCKLE_VARMOD_DOLLAR", "The Hustler"},
+	{"COMPONENT_KNUCKLE_VARMOD_DIAMOND", "The Rock"},
+	{"COMPONENT_KNUCKLE_VARMOD_HATE", "The Hater"},
+	{"COMPONENT_KNUCKLE_VARMOD_LOVE", "The Lover"},
+	{"COMPONENT_KNUCKLE_VARMOD_PLAYER", "The Player"},
+	{"COMPONENT_KNUCKLE_VARMOD_KING", "The King"},
+	{"COMPONENT_KNUCKLE_VARMOD_VAGOS", "The Vagos"},
+
+	-- Switchblade
+	{"COMPONENT_SWITCHBLADE_VARMOD_BASE", "Default Handle"},
+	{"COMPONENT_SWITCHBLADE_VARMOD_VAR1", "VIP Variant"},
+	{"COMPONENT_SWITCHBLADE_VARMOD_VAR2", "Bodyguard Variant"},
+
+	-- For multiple weapons
+	{"COMPONENT_AT_PI_SUPP", "Suppressor"},
+	{"COMPONENT_AT_PI_SUPP_02", "Suppressor"},
+	{"COMPONENT_AT_AR_SUPP_02", "Suppressor"},
+	{"COMPONENT_AT_SR_SUPP_03", "Suppressor"},
+	{"COMPONENT_AT_AR_SUPP", "Suppressor"},
+	{"COMPONENT_AT_PI_FLSH", "Flashlight"},
+	{"COMPONENT_AT_AR_FLSH", "Flashlight"},
+	
+	{"COMPONENT_AT_MUZZLE_01", "Flat Muzzle Brake"},
+	{"COMPONENT_AT_MUZZLE_02", "Tactical Muzzle Brake"},
+	{"COMPONENT_AT_MUZZLE_03", "Fat-End Muzzle Brake"},
+	{"COMPONENT_AT_MUZZLE_04", "Precision Muzzle Brake"},
+	{"COMPONENT_AT_MUZZLE_05", "Heavy Duty Muzzle Brake"},
+	{"COMPONENT_AT_MUZZLE_06", "Slanted Muzzle Brake"},
+	{"COMPONENT_AT_MUZZLE_07", "Split-End Muzzle Brake"},
+	{"COMPONENT_AT_MUZZLE_08", "Squared Muzzle Brake"},
+	
+	{"COMPONENT_AT_AR_AFGRIP_02", "Grip"},
+	{"COMPONENT_AT_AR_AFGRIP", "Grip"},
+
+	{"COMPONENT_AT_SIGHTS", "Holographic Sight"},
+	{"COMPONENT_AT_SCOPE_MACRO_MK2", "Small Scope"},
+	{"COMPONENT_AT_SCOPE_MACRO", "Scope"},
+	{"COMPONENT_AT_SCOPE_SMALL", "Scope"},
+	{"COMPONENT_AT_SCOPE_MEDIUM", "Scope"},
+	{"COMPONENT_AT_SCOPE_SMALL_MK2", "Medium Scope"},	
+	{"COMPONENT_AT_SCOPE_MEDIUM_MK2", "Large Scope"},
+	{"COMPONENT_AT_SCOPE_LARGE", "Scope"},
+	{"COMPONENT_AT_SCOPE_MAX", "Advanced Scope"},
+
+
+	-- pistol
+	{"COMPONENT_PISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_PISTOL_CLIP_02", "Extended Clip"},
+	{"COMPONENT_PISTOL_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
+
+	-- combat pistol
+	{"COMPONENT_COMBATPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_COMBATPISTOL_CLIP_02", "Extended Clip"},
+	{"COMPONENT_COMBATPISTOL_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish"},
+
+	-- ap pistol
+	{"COMPONENT_APPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_APPISTOL_CLIP_02", "Extended Clip"},
+	{"COMPONENT_APPISTOL_VARMOD_LUXE", "Gilded Gun Metal Finish"},
+
+	-- deagle
+	{"COMPONENT_PISTOL50_CLIP_01", "Default Clip"},
+	{"COMPONENT_PISTOL50_CLIP_02", "Extended Clip"},
+	{"COMPONENT_PISTOL50_VARMOD_LUXE", "Platinum Pearl Deluxe Finish"},
+
+	-- Heavy Revolver
+	{"COMPONENT_REVOLVER_CLIP_01", "Default Clip"},
+	{"COMPONENT_REVOLVER_VARMOD_GOON", "Bodyguard Variant"},
+	{"COMPONENT_REVOLVER_VARMOD_BOSS", "VIP Variant"},
+
+	-- SNS Pistol
+	{"COMPONENT_SNSPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_SNSPISTOL_CLIP_02", "Extended Clip"},
+	{"COMPONENT_SNSPISTOL_VARMOD_LOWRIDER", "Etched Wood Grip Finish"},
+
+	-- heavy pist
+	{"COMPONENT_HEAVYPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_HEAVYPISTOL_CLIP_02", "Extended Clip"},
+	{"COMPONENT_HEAVYPISTOL_VARMOD_LUXE", "Etched Wood Grip Finish"},
+
+	-- heavvy rev mk2
+	{"COMPONENT_REVOLVER_MK2_CLIP_01", "Default Rounds"},
+	{"COMPONENT_REVOLVER_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_REVOLVER_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_REVOLVER_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
+	{"COMPONENT_REVOLVER_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_AT_PI_COMP_03", "Compensator"},
+	{"COMPONENT_REVOLVER_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_REVOLVER_MK2_CAMO_IND_01", "Patriotic"},
+
+	-- SNS pistol
+	{"COMPONENT_SNSPISTOL_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_SNSPISTOL_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_SNSPISTOL_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_SNSPISTOL_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_SNSPISTOL_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
+	{"COMPONENT_SNSPISTOL_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_AT_PI_FLSH_03", "Flashlight"},
+	{"COMPONENT_AT_PI_RAIL_02", "Mounted Scope"},
+	{"COMPONENT_AT_PI_COMP_02", "Compensator"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO", "Digital Camo 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_02", "Brushstroke Camo 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_03", "Woodland Camo 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_04", "Skull 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_05", "Sessanta Nove 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_06", "Perseus 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_07", "Leopard 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_08", "Zebra 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_09", "Geometric 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_10", "Boom! 1"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_IND_01", "Boom! 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_SLIDE", "Digital Camo 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_02_SLIDE", "Brushstroke Camo 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_03_SLIDE", "Woodland Camo 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_04_SLIDE", "Skull 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_05_SLIDE", "Sessanta Nove 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_06_SLIDE", "Perseus 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_07_SLIDE", "Leopard 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_08_SLIDE", "Zebra 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_09_SLIDE", "Geometric 2"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_10_SLIDE", "Boom! 3"},
+	{"COMPONENT_SNSPISTOL_MK2_CAMO_IND_01_SLIDE", "Patriotic"},
+
+	-- Pistol mk2
+	{"COMPONENT_PISTOL_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_PISTOL_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_PISTOL_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_PISTOL_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_PISTOL_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
+	{"COMPONENT_PISTOL_MK2_CLIP_FMJ", "Full Metal Jacket Rounds "},
+	{"COMPONENT_AT_PI_RAIL", "Mounted Scope"},
+	{"COMPONENT_AT_PI_FLSH_02", "Flashlight"},
+	{"COMPONENT_AT_PI_COMP", "Compensator"},
+	{"COMPONENT_PISTOL_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_PISTOL_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_PISTOL_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_PISTOL_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_PISTOL_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_PISTOL_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_PISTOL_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_PISTOL_MK2_CAMO_IND_01", "Patriotic"},
+	{"COMPONENT_PISTOL_MK2_CAMO_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_02_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_03_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_04_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_05_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_06_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_07_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_08_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_09_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_10_SLIDE", "Digital Camo"},
+	{"COMPONENT_PISTOL_MK2_CAMO_IND_01_SLIDE", "Patriotic"},
+
+	 -- Vintage Pistol
+	{"COMPONENT_VINTAGEPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_VINTAGEPISTOL_CLIP_02", "Extended Clip"},
+
+	 -- Up-n-Atomizer
+	{"COMPONENT_RAYPISTOL_VARMOD_XMAS18", "Festive tint"},
+
+	 -- Ceramic Pistol
+	{"COMPONENT_CERAMICPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_CERAMICPISTOL_CLIP_02", "Extended Clip"},
+	{"COMPONENT_CERAMICPISTOL_SUPP", "Suppressor"},
+
+	 -- Micro SMG
+	{"COMPONENT_MICROSMG_CLIP_01", "Default Clip"},
+	{"COMPONENT_MICROSMG_CLIP_02", "Extended Clip"},
+	{"COMPONENT_MICROSMG_VARMOD_LUXE", "Yusuf Amir Luxury Finish "},
+
+	 -- SMG
+	{"COMPONENT_SMG_CLIP_01", "Default Clip"},
+	{"COMPONENT_SMG_CLIP_02", "Extended Clip"},
+	{"COMPONENT_SMG_CLIP_03", "Drum Magazine"},
+	{"COMPONENT_AT_SCOPE_MACRO_02", "Scope"},
+	{"COMPONENT_SMG_VARMOD_LUXE", "Yusuf Amir Luxury Finish "},
+
+	 -- Assault SMG
+	{"COMPONENT_ASSAULTSMG_CLIP_01", "Default Clip"},
+	{"COMPONENT_ASSAULTSMG_CLIP_02", "Extended Clip"},
+	{"COMPONENT_ASSAULTSMG_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish "},
+
+	 -- Mini SMG
+	{"COMPONENT_MINISMG_CLIP_01", "Default Clip"},
+	{"COMPONENT_MINISMG_CLIP_02", "Extended Clip"},
+
+	 -- SMG Mk II
+	{"COMPONENT_SMG_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_SMG_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_SMG_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_SMG_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_SMG_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
+	{"COMPONENT_SMG_MK2_CLIP_FMJ", "Full Metal Jacket Rounds "},
+	{"COMPONENT_AT_SIGHTS_SMG", "Holographic Sight"},
+	{"COMPONENT_AT_SCOPE_MACRO_02_SMG_MK2", "Small Scope"},
+	{"COMPONENT_AT_SCOPE_SMALL_SMG_MK2", "Medium Scope"},
+	{"COMPONENT_AT_SB_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_SB_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_SMG_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_SMG_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_SMG_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_SMG_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_SMG_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_SMG_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_SMG_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_SMG_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_SMG_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_SMG_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_SMG_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Machine Pistol
+	{"COMPONENT_MACHINEPISTOL_CLIP_01", "Default Clip"},
+	{"COMPONENT_MACHINEPISTOL_CLIP_02", "Extended Clip"},
+	{"COMPONENT_MACHINEPISTOL_CLIP_03", "Drum Magazine"},
+
+	 -- Combat PDW
+	{"COMPONENT_COMBATPDW_CLIP_01", "Default Clip"},
+	{"COMPONENT_COMBATPDW_CLIP_02", "Extended Clip"},
+	{"COMPONENT_COMBATPDW_CLIP_03", "Drum Magazine"},
+
+	 -- Pump Shotgun
+	{"COMPONENT_AT_SR_SUPP", "Suppressor"},
+	{"COMPONENT_PUMPSHOTGUN_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish"},
+
+	 -- Sawed-Off Shotgun
+	{"COMPONENT_SAWNOFFSHOTGUN_VARMOD_LUXE", "Gilded Gun Metal Finish"},
+
+	 -- Assault Shotgun
+	{"COMPONENT_ASSAULTSHOTGUN_CLIP_01", "Default Clip"},
+	{"COMPONENT_ASSAULTSHOTGUN_CLIP_02", "Extended Clip"},
+
+	 -- Pump Shotgun Mk II
+	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_01", "Default Shells"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_INCENDIARY", "Dragon's Breath Shells"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_ARMORPIERCING", "Steel Buckshot Shells"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_HOLLOWPOINT", "Flechette Shells"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_EXPLOSIVE", "Explosive Slugs"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Heavy Shotgun
+	{"COMPONENT_HEAVYSHOTGUN_CLIP_01", "Default Clip"},
+	{"COMPONENT_HEAVYSHOTGUN_CLIP_02", "Extended Clip"},
+	{"COMPONENT_HEAVYSHOTGUN_CLIP_03", "Drum Magazine"},
+
+	 -- Assault Rifle
+	{"COMPONENT_ASSAULTRIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_ASSAULTRIFLE_CLIP_02", "Extended Clip"},
+	{"COMPONENT_ASSAULTRIFLE_CLIP_03", "Drum Magazine"},
+	{"COMPONENT_ASSAULTRIFLE_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
+
+	 -- Carbine Rifle
+	{"COMPONENT_CARBINERIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_CARBINERIFLE_CLIP_02", "Extended Clip"},
+	{"COMPONENT_CARBINERIFLE_CLIP_03", "Box Magazine"},
+	{"COMPONENT_CARBINERIFLE_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
+
+	 -- Advanced Rifle
+	{"COMPONENT_ADVANCEDRIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_ADVANCEDRIFLE_CLIP_02", "Extended Clip"},
+	{"COMPONENT_ADVANCEDRIFLE_VARMOD_LUXE", "Gilded Gun Metal Finish"},
+
+	 -- Special Carbine
+	{"COMPONENT_SPECIALCARBINE_CLIP_01", "Default Clip"},
+	{"COMPONENT_SPECIALCARBINE_CLIP_02", "Extended Clip"},
+	{"COMPONENT_SPECIALCARBINE_CLIP_03", "Drum Magazine"},
+	{"COMPONENT_SPECIALCARBINE_VARMOD_LOWRIDER", "Etched Gun Metal Finish"},
+
+	 -- Bullpup Rifle
+	{"COMPONENT_BULLPUPRIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_BULLPUPRIFLE_CLIP_02", "Extended Clip"},
+	{"COMPONENT_BULLPUPRIFLE_VARMOD_LOW", "Gilded Gun Metal Finish"},
+
+	 -- Bullpup Rifle Mk II
+	{"COMPONENT_AT_SCOPE_MACRO_02_MK2", "Small Scope"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},	
+	{"COMPONENT_AT_BP_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_BP_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Special Carbine Mk II
+	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_AT_SC_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_SC_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Assault Rifle Mk II
+	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_AT_AR_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_AR_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Carbine Rifle Mk II
+	{"COMPONENT_CARBINERIFLE_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_CARBINERIFLE_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_CARBINERIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_CARBINERIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_CARBINERIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
+	{"COMPONENT_CARBINERIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_AT_CR_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_CR_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_CARBINERIFLE_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Compact Rifle
+	{"COMPONENT_COMPACTRIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_COMPACTRIFLE_CLIP_02", "Extended Clip"},
+	{"COMPONENT_COMPACTRIFLE_CLIP_03", "Drum Magazine"},
+
+	 -- Military Rifle
+	{"COMPONENT_MILITARYRIFLE_SIGHT_01", "Iron Sight"},
+	{"COMPONENT_MILITARYRIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_MILITARYRIFLE_CLIP_02", "Extended Clip"},	
+
+	--Heavy rifle
+	{"COMPONENT_HEAVYRIFLE_CAMO1", "Families Finish"},
+
+	 -- MG
+	{"COMPONENT_AT_SCOPE_SMALL_02", "Scope"},
+	{"COMPONENT_MG_CLIP_01", "Default Clip"},
+	{"COMPONENT_MG_CLIP_02", "Extended Clip"},	
+	{"COMPONENT_MG_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish"},
+
+	 -- Combat MG
+	{"COMPONENT_COMBATMG_CLIP_01", "Default Clip"},
+	{"COMPONENT_COMBATMG_CLIP_02", "Extended Clip"},
+	{"COMPONENT_COMBATMG_VARMOD_LOWRIDER", "Etched Gun Metal Finish"},
+
+	 -- Combat MG Mk II
+	{"COMPONENT_COMBATMG_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_COMBATMG_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_COMBATMG_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_COMBATMG_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_COMBATMG_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
+	{"COMPONENT_COMBATMG_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_AT_MG_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_MG_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_COMBATMG_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_COMBATMG_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Gusenberg Sweeper
+	{"COMPONENT_GUSENBERG_CLIP_01", "Default Clip"},
+	{"COMPONENT_GUSENBERG_CLIP_02", "Extended Clip"},
+
+	 -- Sniper Rifle
+	{"COMPONENT_SNIPERRIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_SNIPERRIFLE_VARMOD_LUXE", "Etched Wood Grip Finish"},
+
+	 -- Heavy Sniper
+	{"COMPONENT_HEAVYSNIPER_CLIP_01", "Default Clip"},
+
+	 -- Marksman Rifle Mk II
+	{"COMPONENT_AT_SCOPE_LARGE_FIXED_ZOOM_MK2", "Zoom Scope"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_02", "Extended Clip"},	
+	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_AT_MRFL_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_MRFL_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_10", "Boom! 1"},
+	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_IND_01", "Boom! 2"},
+
+	 -- Heavy Sniper Mk II
+	{"COMPONENT_AT_MUZZLE_09", "Bell-End Muzzle Brake"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_01", "Default Clip"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_02", "Extended Clip"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_EXPLOSIVE", "Explosive Rounds"},
+	{"COMPONENT_AT_SCOPE_LARGE_MK2", "Zoom Scope"},
+	{"COMPONENT_AT_SCOPE_NV", "Night Vision Scope"},
+	{"COMPONENT_AT_SCOPE_THERMAL", "Thermal Scope"},	
+	{"COMPONENT_AT_SR_BARREL_01", "Default Barrel"},
+	{"COMPONENT_AT_SR_BARREL_02", "Heavy Barrel"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO", "Digital Camo"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_02", "Brushstroke Camo"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_03", "Woodland Camo"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_04", "Skull"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_05", "Sessanta Nove"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_06", "Perseus"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_07", "Leopard"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_08", "Zebra"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_09", "Geometric"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_10", "Boom!"},
+	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_IND_01", "Patriotic"},
+
+	 -- Marksman Rifle
+	{"COMPONENT_AT_SCOPE_LARGE_FIXED_ZOOM", "Scope"},
+	{"COMPONENT_MARKSMANRIFLE_CLIP_01", "Default Clip"},
+	{"COMPONENT_MARKSMANRIFLE_CLIP_02", "Extended Clip"},	
+	{"COMPONENT_MARKSMANRIFLE_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
+
+	-- grenade
+	{"COMPONENT_GRENADELAUNCHER_CLIP_01", "Default Clip"}
+}
+weaponCats = {
+	"Assault Rifles",
+	"Sniper Rifles",
+	"Meele Weapons",
+	"Shotguns",
+	"Heavy Weapons",
+	"Grenades",
+	"Pistols",
+	"S/LMGs",
+}
+tintsNormal = {
+	"Default/Black",
+	"Green",
+	"Gold",
+	"Pink",
+	"Army",
+	"LSPD",
+	"Orange",
+	"Platinum"
+}
+tintsRays = {
+	"Default",
+	"Purple",
+	"Green",
+	"Orange",
+	"Pink",
+	"Gold",
+	"Platinum"
+}
+tintsMK2s = {
+	"Classic Black",
+	"Classic Gray",
+	"Classic Two-Tone",
+	"Classic White",
+	"Classic Beige",
+	"Classic Green",
+	"Classic Blue",
+	"Classic Earth",
+	"Classic Brown & Black",
+	"Red Contrast",
+	"Blue Contrast",
+	"Yellow Contrast",
+	"Orange Contrast",
+	"Bold Pink",
+	"Bold Purple & Yellow",
+	"Bold Orange",
+	"Bold Green & Purple",
+	"Bold Red Features",
+	"Bold Green Features",
+	"Bold Cyan Features",
+	"Bold Yellow Features",
+	"Bold Red & White",
+	"Bold Blue & White",
+	"Metallic Gold",
+	"Metallic Platinum",
+	"Metallic Gray & Lilac",
+	"Metallic Purple & Lime",
+	"Metallic Red",
+	"Metallic Green",
+	"Metallic Blue",
+	"Metallic White & Aqua",
+	"Metallic Orange & Yellow",
+	"Mettalic Red and Yellow"
+}
+
+liveryColorsMK2 = {
+	"Gray",
+	"Dark Gray",
+	"Black",
+	"White",
+	"Blue",
+	"Cyan",
+	"Aqua",
+	"Cool Blue",
+	"Dark Blue",
+	"Royal Blue",
+	"Plum",
+	"Dark Purple",
+	"Purple",
+	"Red",
+	"Wine Red",
+	"Magenta",
+	"Pink",
+	"Salmon",
+	"Hot Pink",
+	"Rust Orange",
+	"Brown",
+	"Earth",
+	"Orange",
+	"Light Orange",
+	"Dark Yellow",
+	"Yellow",
+	"Light Brown",
+	"Lime Green",
+	"Olive",
+	"Moss",
+	"Turquoise",
+	"Dark Green"
+}
+
+local allWeapons = {}
+myWeapons = {}
+local function GetWeaponStuff()	
+	local MyPed = myHandle()
+	if MyPed and MyPed ~= 0 then
+		local temp = {}
+		for c in pairs(allweaponCatsAndNames) do
+			for i=1,#allweaponCatsAndNames[c] do
+				if Natives.InvokeBool(0x8DECB02F88F428BC, MyPed, joaat(allweaponCatsAndNames[c][i][1])) then
+					myWeapons[allweaponCatsAndNames[c][i][1]] = allweaponCatsAndNames[c][i][1]
+					FeatureMgr.GetFeature(joaat("give" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+					FeatureMgr.GetFeature(joaat("remove" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleAttachments then
+						FeatureMgr.GetFeature(joaat("attachmentsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+					end
+					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleCamos then
+						FeatureMgr.GetFeature(joaat("camoCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+					end
+					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType ~= "none" then
+						FeatureMgr.GetFeature(joaat("tintCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+						FeatureMgr.GetFeature(joaat("setTint" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+					end
+					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType == "tintsMK2s" then
+						FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+						FeatureMgr.GetFeature(joaat("mk2TintsSet" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+					end
+				else
+					myWeapons[allweaponCatsAndNames[c][i][1]] = nil
+					FeatureMgr.GetFeature(joaat("give" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
+					FeatureMgr.GetFeature(joaat("remove" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleAttachments then
+						FeatureMgr.GetFeature(joaat("attachmentsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+						FeatureMgr.GetFeature(joaat("addAttachment" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+						FeatureMgr.GetFeature(joaat("removeAttachment" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+					end
+					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleCamos then
+						FeatureMgr.GetFeature(joaat("addCamo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+						FeatureMgr.GetFeature(joaat("removeCamo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+						FeatureMgr.GetFeature(joaat("camoCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+					end
+					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType ~= "none" then
+						FeatureMgr.GetFeature(joaat("tintCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+						FeatureMgr.GetFeature(joaat("setTint" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+					end
+					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType == "tintsMK2s" then
+						FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+						FeatureMgr.GetFeature(joaat("mk2TintsSet" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
+					end
+				end
+			end
+		end
+		-------------
+		yield()
+		-------------			
+		for i in pairs(myWeapons) do
+			if allWeapons[i].possibleAttachments then
+				local currentComboIndex = FeatureMgr.GetFeature(joaat("attachmentsCombo" .. i)):GetListIndex()+1
+				for att=1,#allWeapons[i].possibleAttachments do
+					if Natives.InvokeBool(0xC593212475FAE340, MyPed, joaat(i), joaat(allWeapons[i].possibleAttachments[att][1])) then
+						table.insert(temp, allWeapons[i].possibleAttachments[att])
+						if allWeapons[i].possibleAttachments[att] == allWeapons[i].possibleAttachments[currentComboIndex] then
+							FeatureMgr.GetFeature(joaat("addAttachment" .. i)):SetVisible(false)
+							FeatureMgr.GetFeature(joaat("removeAttachment" .. i)):SetVisible(true)
+						end
+					else
+						if allWeapons[i].possibleAttachments[att] == allWeapons[i].possibleAttachments[currentComboIndex] then
+							FeatureMgr.GetFeature(joaat("addAttachment" .. i)):SetVisible(true)
+							FeatureMgr.GetFeature(joaat("removeAttachment" .. i)):SetVisible(false)
+						end				
+					end
+				end		
+				allWeapons[i].currentAttachments,temp = temp,{nil}
+			end
+			-------------------------------------------------------
+			if allWeapons[i].possibleCamos then
+				local currentComboIndex = FeatureMgr.GetFeature(joaat("camoCombo" .. i)):GetListIndex()+1
+				for camo=1,#allWeapons[i].possibleCamos do
+					if Natives.InvokeBool(0xC593212475FAE340, MyPed, joaat(i), joaat(allWeapons[i].possibleCamos[camo][1])) then
+						if allWeapons[i].possibleCamos[camo] == allWeapons[i].possibleCamos[currentComboIndex] then
+							FeatureMgr.GetFeature(joaat("addCamo" .. i)):SetVisible(false)
+							FeatureMgr.GetFeature(joaat("removeCamo" .. i)):SetVisible(true)
+						end
+						allWeapons[i].camoEquipped = allWeapons[i].possibleCamos[camo]
+						allWeapons[i].camoTintEquipped = Natives.InvokeInt(0xF0A60040BE558F2D, MyPed, joaat(i), joaat(allWeapons[i].possibleCamos[camo][1]))
+					else
+						if allWeapons[i].possibleCamos[camo] == allWeapons[i].possibleCamos[currentComboIndex] then
+							FeatureMgr.GetFeature(joaat("addCamo" .. i)):SetVisible(true)
+							FeatureMgr.GetFeature(joaat("removeCamo" .. i)):SetVisible(false)
+						end
+						allWeapons[i].camoEquipped = -1
+					end
+				end
+			end
+			allWeapons[i].tintEquipped = Natives.InvokeInt(0x2B9EEDC07BD06B9F, MyPed, joaat(i))
+		end
+		yield(100)
+	end
+end
+function giveLoadOut()
+	local LoadoutPath = FileMgr.GetMenuRootPath() .. "\\Lua\\resources\\loadout.txt"
+	if not FileMgr.DoesFileExist(LoadoutPath) then Logger.LogInfo("No loadout file") return end
+	local lo = FileMgr.ReadFileContent(LoadoutPath)
+	-- very basic check if there is any weird shit in the file
+	if not lo or lo == "" or string.match(lo, "\\") or string.match(lo, '%(') or  string.match(lo, "%)") or string.match(lo, "%.") then return end
+	lo = load(lo)()	
+	local MyPed = myHandle()
+	Natives.InvokeVoid(0xF25DF915FA38C5F3, myHandle())
+	for w in pairs(lo) do
+		local whash = joaat(w)
+		if not Natives.InvokeBool(0x937C71165CF334B3, whash) then Logger.LogError("DEV_ERR: invalid weapon hash '"..whash.."'") goto continue end
+		giveWeapon(whash)
+		yield()
+		Natives.InvokeVoid(0x50969B9B89ED5738, MyPed, whash, lo[w].TintIndex)
+		if lo[w].Camo and lo[w].Camo ~= "" and lo[w].Camo ~= "-1" then
+			Natives.InvokeVoid(0xD966D51AA5B28BB9, MyPed, whash, joaat(lo[w].Camo))
+			if lo[w].CamoTint and lo[w].CamoTint ~= "" and lo[w].CamoTint ~= "-1" then -- only for mk2
+				Natives.InvokeVoid(0x9FE5633880ECD8ED, MyPed, whash, joaat(lo[w].Camo), tonumber(lo[w].CamoTint))
+			end
+		end
+		if lo[w].Components and type(lo[w].Components) == "table" then
+			for i=1,#lo[w].Components do
+				Natives.InvokeVoid(0xD966D51AA5B28BB9, MyPed, whash, joaat(lo[w].Components[i]))
+			end
+		end
+		::continue::
+	end	
+	Logger.LogInfo("loaded loudout")
+end
+function saveLoadOut()
+	local LoadoutPath = FileMgr.GetMenuRootPath() .. "\\Lua\\resources\\loadout.txt"
+	Logger.LogInfo("Saving loadout...")
+	FileMgr.WriteFileContent(LoadoutPath, "return {\n")
+	for myW in pairs(myWeapons) do
+		print("Saving " .. myW)
+		FileMgr.WriteFileContent(LoadoutPath, "\t[\""..myW.."\"] = {\n", true)
+
+		FileMgr.WriteFileContent(LoadoutPath, "\t\tTintIndex = " .. (allWeapons[myW].tintEquipped or "0") .. ",\n", true)
+
+		FileMgr.WriteFileContent(LoadoutPath, "\t\tCamo = \"" , true)
+		if allWeapons[myW].camoEquipped and allWeapons[myW].camoEquipped ~= -1 and allWeapons[myW].camoEquipped[1] then
+			FileMgr.WriteFileContent(LoadoutPath, (allWeapons[myW].camoEquipped[1] or "-1") .. "\",\n", true)
+			FileMgr.WriteFileContent(LoadoutPath, "\t\tCamoTint = " .. (allWeapons[myW].camoTintEquipped or "-1") .. ",\n", true)
+		else
+			FileMgr.WriteFileContent(LoadoutPath, "-1\",\n", true)
+			FileMgr.WriteFileContent(LoadoutPath, "\t\tCamoTint = -1,\n", true)
+		end		
+
+		FileMgr.WriteFileContent(LoadoutPath, "\t\tComponents = {\n", true)
+		if not allWeapons[myW].currentAttachments then goto next end -- these weapons cant take any components
+		if #allWeapons[myW].currentAttachments == 0 and dbg then Logger.LogError("No attachments for " .. myW) goto next end -- no equiped attachments
+		for i=1,#allWeapons[myW].currentAttachments do
+			FileMgr.WriteFileContent(LoadoutPath, "\t\t\t\"" .. allWeapons[myW].currentAttachments[i][1] .."\",\n", true)
+		end
+		::next::
+		FileMgr.WriteFileContent(LoadoutPath, "\t\t}\n", true)
+
+		FileMgr.WriteFileContent(LoadoutPath, "\t},\n", true)
+	end
+	FileMgr.WriteFileContent(LoadoutPath, "}", true)
+	Logger.LogInfo("done!")
+end
+function giveWeapon(WeaponName)	
+	if not WeaponName or WeaponName == 0x0 then return end
+	if type(WeaponName) == "string" then WeaponName = joaat(WeaponName) end
+	if not Natives.InvokeBool(0x937C71165CF334B3, WeaponName) then Logger.LogError("DEV_ERR1: invalid weapon hash '"..WeaponName.."'") return end
+	Natives.InvokeVoid(0xBF0FD6E56C964FCB, myHandle(), WeaponName, 69, true, false)
+end
+function removeWeapon(WeaponName)
+	if not WeaponName or WeaponName == 0x0 then return end
+	if type(WeaponName) == "string" then WeaponName = joaat(WeaponName) end
+	if not Natives.InvokeBool(0x937C71165CF334B3, WeaponName) then Logger.LogError("DEV_ERR2: invalid weapon hash '"..WeaponName.."'") return end
+	Natives.InvokeVoid(0x4899CB088EDF59B8, myHandle(), WeaponName)
+end
+function fillAmmoForWeapon(WeaponName)
+	if not WeaponName or WeaponName == 0x0 then return end
+	if type(WeaponName) == "string" then WeaponName = joaat(WeaponName) end
+	if not Natives.InvokeBool(0x937C71165CF334B3, WeaponName) then Logger.LogError("DEV_ERR3: invalid weapon hash '"..WeaponName.."'") return end
+	local MyPed = myHandle()
+	if Natives.InvokeBool(0x8DECB02F88F428BC, MyPed, WeaponName) then
+		Natives.InvokeVoid(0x14E56BC5B5DB6A19, MyPed, WeaponName, 9999)
+
+		local clipSize = Natives.InvokeInt(0xA38DCFFCEA8962FA, MyPed, WeaponName, true)
+		Natives.InvokeBool(0xDCD2A934D65CB497, MyPed, WeaponName, clipSize)		
+
+		local AmmoType = Natives.InvokeInt(0x7FEAD38B326B9F74, MyPed, WeaponName)
+		Natives.InvokeVoid(0x5FD1E1F011E76D7E, MyPed, AmmoType, 9999)
+	end
+end
+function forAllWeaponsDo(action)
+	if action == "removecomp" or action == "ammo" then
+		for i in pairs(myWeapons) do
+			if action == "removecomp" then
+				if allWeapons[i].possibleAttachments then
+					for j=1,#allWeapons[i].possibleAttachments do
+						Natives.InvokeVoid(0x1E8BE90C74FB4C09, myHandle(), joaat(i), joaat(allWeapons[i].possibleAttachments[j][1]))
+					end
+				end
+			else
+				fillAmmoForWeapon(i)
+			end
+		end
+		return
+	end
+	if action == "give" then
+		FeatureMgr.TriggerFeatureCallback(joaat("GiveAllWeapons"))
+	elseif action == "remove" then
+		FeatureMgr.TriggerFeatureCallback(joaat("RemoveAllWeapons"))
+	elseif action == "givecomp" then
+		FeatureMgr.TriggerFeatureCallback(joaat("GiveallWeaponComponents"))
+	else
+		Logger.LogError("DEV_ERR: invalid action '"..tostring(action).."'")
+	end
+end
+
+local WeaponFeatures = {
+	FeatureMgr.AddFeature(joaat("ComboWeaponCategory"), "###ComboWeaponCategory", eFeatureType.Combo, "", function() end, false):SetList(weaponCats):SetListIndex(0),	
+	FeatureMgr.AddFeature(joaat("GiveAllWeaponAttachment"), "Give Components", eFeatureType.Button, "Adds all possible attachments to all currently equiped Weapons",
+		function()
+			forAllWeaponsDo("givecomp")
+		end),
+
+	FeatureMgr.AddFeature(joaat("RemoveAllWeaponAttachment"), "Remove Components", eFeatureType.Button, "Removes every attachment from every Weapon",
+		function()
+			forAllWeaponsDo("removecomp")
+		end),
+
+	FeatureMgr.AddFeature(joaat("FillAmmo"), "Fill Ammo", eFeatureType.Button, "Fills ammo for all weapons you have equiped",
+		function()
+			forAllWeaponsDo("ammo")
+		end),
+
+	FeatureMgr.AddFeature(joaat("giveLoadOut"), "Load Loadout", eFeatureType.Button, "Loads the loadout from a file",
+		function()
+			giveLoadOut()
+		end),
+
+	FeatureMgr.AddFeature(joaat("saveLoadOut"), "Save Loadout", eFeatureType.Button, "Saves your current loadout to a file. Will overwrite the current saved laodout",
+		function()
+			saveLoadOut()
+		end, false),
+
+	FeatureMgr.AddFeature(joaat("FillAmmoOnWeaponChange"), "Max Ammo on Weapon Change", eFeatureType.Toggle, "Fills the ammo for the weapon you have in your hands when you switch them",
+		function(f)
+			if (f) then
+				fillAmmoForWeapon(Natives.InvokeInt(0x0A6DB4965674D243, myHandle()))
+			end
+		end):SetDefaultValue(true):Reset():RegisterCallbackTrigger(eCallbackTrigger.OnWeaponChange),
+
+	FeatureMgr.AddFeature(joaat("AutoLoadLoadout"), "Loadout", eFeatureType.Toggle, "Gives you your loadout on every new session", 
+		function(f)
+			if f:GetBoolValue() then
+				FeatureMgr.GetFeature(joaat("AutoGiveAllWeaopns")):SetValue(false)
+			end
+		end, false):SetDefaultValue(true):Reset(),
+
+	FeatureMgr.AddFeature(joaat("AutoGiveAllWeaopns"), "All Weapons", eFeatureType.Toggle, "Gives you all Weapon on every new session", 
+		function(f)
+			if f:GetBoolValue() then
+				FeatureMgr.GetFeature(joaat("AutoLoadLoadout")):SetValue(false)
+			end 
+		end, false),
+
+	FeatureMgr.AddFeature(joaat("giveWeaponPara"), "Give Parachute", eFeatureType.Button, "",
+		function() 
+			giveWeapon(joaat("GADGET_PARACHUTE"))
+		end),
+}
+
+function renderAttachmentOptions(cat)
+	for i=1,#allweaponCatsAndNames[cat] do
+		-- hashname not hash but idc
+		thisHash, thisName = allweaponCatsAndNames[cat][i][1], tostring(allweaponCatsAndNames[cat][i][2])
+		if ImGui.TreeNode(thisName) then
+			if not myWeapons[thisHash] then
+				ClickGUI.RenderFeature(joaat("give" .. thisHash))
+			else				
+				ClickGUI.RenderFeature(joaat("remove" .. thisHash))			
+				if allWeapons[thisHash].possibleAttachments and type(allWeapons[thisHash].possibleAttachments) == "table" then
+					if #allWeapons[thisHash].possibleAttachments == 1 then
+						ClickGUI.RenderFeature(joaat("addAttachment" .. thisHash))
+					elseif #allWeapons[thisHash].possibleAttachments >= 2 then
+						-- if ImGui.BeginCombo("##WeaponAttachments"..thisHash, tostring(allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted][2])) then
+						-- 	for j=1,#allWeapons[thisHash].possibleAttachments do
+						-- 		if allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted] then
+						-- 			isSelected = false
+						-- 			if allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted][2] == allWeapons[thisHash].possibleAttachments[j][2] then
+						-- 				isSelected = true
+						-- 			end
+						-- 			local showSep,showSepBefore = false,false
+						-- 			if string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "grip") then showSep = true end
+						-- 			if string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "flashlight") then showSep = true end
+						-- 			if string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "default") then showSepBefore = true end
+						-- 			if showSep or showSepBefore then ImGui.Separator() end
+						-- 			if ImGui.Selectable(allWeapons[thisHash].possibleAttachments[j][2], isSelected) then
+						-- 				allWeapons[thisHash].attachmentSelcted = j
+						-- 				if isSelected then
+						-- 					ImGui.SetItemDefaultFocus()
+						-- 				end
+						-- 			end
+						-- 			-- > 7 bc some dont have a grip etc so it would show 2 separators -> works, would need to check all weapons now but im lazy :Troll
+						-- 			if #allWeapons[thisHash].possibleAttachments > 7 and showSep or (string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "explo") and j ~= #allWeapons[thisHash].possibleAttachments) then
+						-- 				ImGui.Separator()
+						-- 			end
+						-- 		else
+						-- 			Logger.LogError(tostring(allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted]))
+						-- 		end								
+						-- 	end	
+						-- 	ImGui.EndCombo()
+						-- end
+						ImGui.Separator()
+						ClickGUI.RenderFeature(joaat("attachmentsCombo" .. thisHash))
+						-- ImGui.SameLine()
+						ClickGUI.RenderFeature(joaat("removeAttachment" .. thisHash))
+						ClickGUI.RenderFeature(joaat("addAttachment" .. thisHash))
+						ImGui.Separator()
+					end
+					::attachmenttGui::					
+				end
+				if allWeapons[thisHash].tintType ~= "none" then
+					ClickGUI.RenderFeature(joaat("tintCombo" .. thisHash))
+					ImGui.SameLine()
+					ClickGUI.RenderFeature(joaat("setTint" .. thisHash))
+				end
+				if allWeapons[thisHash].possibleCamos then						
+					if #allWeapons[thisHash].possibleCamos ~= 1 then
+						ClickGUI.RenderFeature(joaat("camoCombo" .. thisHash))
+						ImGui.SameLine()
+					end
+					ClickGUI.RenderFeature(joaat("removeCamo" .. thisHash))
+					ClickGUI.RenderFeature(joaat("addCamo" .. thisHash))
+					if allWeapons[thisHash].tintType == "tintsMK2s" and allWeapons[thisHash].camoEquipped ~= -1 then
+						ClickGUI.RenderFeature(joaat("mk2TintsCombo" .. thisHash))
+						ImGui.SameLine()
+						ClickGUI.RenderFeature(joaat("mk2TintsSet" .. thisHash))
+					end
+				end
+			end
+			ImGui.TreePop()
+		end
+	end
+end
+
+function clickGUI()
+	if ImGui.BeginTabBar("WM##TabBar") then		
+		if ImGui.BeginTabItem("Weapon Manager") then
+			if ImGui.BeginTable("WeaponManager1", 2, ImGuiTableFlags.Resizable) then
+				ImGui.TableNextRow()
+				for column = 0,1 do
+					ImGui.TableSetColumnIndex(column)
+					if column == 0 then
+						ClickGUI.RenderFeature(joaat("ComboWeaponCategory"))
+						local CurrCatVal = weaponCats[WeaponFeatures[1]:GetListIndex()+1]
+						if CurrCatVal == "Assault Rifles" then
+							renderAttachmentOptions('assault_rifles')
+						elseif CurrCatVal == "Sniper Rifles" then
+							renderAttachmentOptions('sniper_rifles')
+						elseif CurrCatVal == "Meele Weapons" then
+							renderAttachmentOptions('melees')
+						elseif CurrCatVal == "Shotguns" then
+							renderAttachmentOptions('shotguns')
+						elseif CurrCatVal == "Heavy Weapons" then
+							renderAttachmentOptions('heavys')
+						elseif CurrCatVal == "Grenades" then
+							renderAttachmentOptions('nades')
+						elseif CurrCatVal == "Pistols" then
+							renderAttachmentOptions('pistols')
+						elseif CurrCatVal == "S/LMGs" then
+							renderAttachmentOptions('s_l_mgs')
+						else
+							Logger.LogError("Invalid TAB:".. CurrCatVal)
+						end
+					else
+						if ClickGUI.BeginCustomChildWindow("All Weapons") then
+							ClickGUI.RenderFeature(joaat("GiveAllWeapons"))
+							ImGui.SameLine()
+							ClickGUI.RenderFeature(joaat("RemoveAllWeapons"))
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("GiveAllWeaponAttachment"))
+							ImGui.SameLine()
+							ClickGUI.RenderFeature(joaat("RemoveAllWeaponAttachment"))
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("FillAmmo"))				
+							ClickGUI.EndCustomChildWindow()
+						end
+						if ClickGUI.BeginCustomChildWindow("Loadout") then
+							ClickGUI.RenderFeature(joaat("giveLoadOut"))
+							ImGui.SameLine()						
+							ClickGUI.RenderFeature(joaat("saveLoadOut"))
+							ImGui.Separator()
+							ImGui.Text("Auto give on New Session:")
+							ClickGUI.RenderFeature(joaat("AutoLoadLoadout"))
+							ImGui.SameLine()
+							ClickGUI.RenderFeature(joaat("AutoGiveAllWeaopns"))
+							ClickGUI.EndCustomChildWindow()
+						end
+						if ClickGUI.BeginCustomChildWindow("Weapon values") then
+							ClickGUI.RenderFeature(950937895)
+							ClickGUI.RenderFeature(1266914962)
+							ClickGUI.RenderFeature(378227101)
+							ClickGUI.RenderFeature(851365501)
+							ClickGUI.RenderFeature(2593851087)
+							ClickGUI.RenderFeature(4252099700)
+							ClickGUI.RenderFeature(3846859030)
+							ClickGUI.RenderFeature(2885146915)
+							ClickGUI.EndCustomChildWindow()
+						end
+					end
+				end
+				ImGui.EndTable()
+			end
+			ImGui.EndTabItem()
+		end
+		if ImGui.BeginTabItem("Cherax Aimbot") then
+			if ImGui.BeginTable("WeaponManager2", 2, ImGuiTableFlags.Resizable) then
+				ImGui.TableNextRow()
+				for column = 0,1 do
+					ImGui.TableSetColumnIndex(column)
+					if column == 0 then
+						if ClickGUI.BeginCustomChildWindow("Aimbot") then
+							ClickGUI.RenderFeature(joaat("AimbotEnabled"))							
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("AimbotKey"))
+							ClickGUI.RenderFeature(joaat("AimbotTargetMode"))
+							ClickGUI.RenderFeature(joaat("AimbotTargetBone"))
+							ImGui.Separator()
+							ClickGUI.RenderFeature(2142674441) -- Bulletprediciton
+							ClickGUI.RenderFeature(415855969) -- frame predicion
+							ClickGUI.RenderFeature(joaat("AimbotVisibleCheck"))
+							ClickGUI.RenderFeature(joaat("AimbotShowLockedOn"))							
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("AimbotShootDead"))
+							ClickGUI.RenderFeature(joaat("AimbotShootNPCs"))
+							ClickGUI.RenderFeature(joaat("AimbotShootCops"))
+							ClickGUI.RenderFeature(joaat("AimbotShootPlayers"))
+							ClickGUI.RenderFeature(joaat("AimbotFriendlyFire"))							
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("AimbotCircleColor"))
+							ClickGUI.EndCustomChildWindow()
+						end
+					else
+						if ClickGUI.BeginCustomChildWindow("Settings") then
+							ClickGUI.RenderFeature(joaat("AimbotAutoDistance"))
+							ClickGUI.RenderFeature(joaat("AimbotDistance"))
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("AimbotDrawFOV"))
+							ClickGUI.RenderFeature(joaat("AimbotFOV"))
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("AimbotTargetSwitchDelay"))
+							ClickGUI.RenderFeature(joaat("AimbotSmoothAim"))
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("AimbotDeadZone"))
+							ClickGUI.RenderFeature(joaat("AimbotShowDeadZone"))							
+							ClickGUI.RenderFeature(joaat("AimbotDeadZoneRadius"))
+							ImGui.Separator()							
+							ClickGUI.RenderFeature(joaat("AimbotSilentBullets"))
+							ClickGUI.RenderFeature(joaat("AimbotSilentMagicBullets"))
+							ClickGUI.RenderFeature(joaat("AimbotDrawSilentFOV"))
+							ClickGUI.RenderFeature(joaat("AimbotSilentFOV"))
+							ClickGUI.EndCustomChildWindow()
+						end
+					end
+				end
+				ImGui.EndTable()
+			end
+			ImGui.EndTabItem()
+		end
+		if ImGui.BeginTabItem("Others") then
+			if ImGui.BeginTable("WeaponManager3", 2, ImGuiTableFlags.Resizable) then
+				ImGui.TableNextRow()
+				for column = 0,1 do
+					ImGui.TableSetColumnIndex(column)
+					if column == 0 then							
+						if ClickGUI.BeginCustomChildWindow("Misc") then							
+							ClickGUI.RenderFeature(joaat("CustomImpactType"))
+							ClickGUI.RenderFeature(joaat("CustomImpact"))
+							ImGui.Separator()
+							ClickGUI.RenderFeature(joaat("giveWeaponPara"))
+							ClickGUI.RenderFeature(joaat("RapidFire"))
+							ClickGUI.RenderFeature(445878866) -- unlimited range
+							ClickGUI.RenderFeature(joaat("InstantLockOn"))
+							ClickGUI.RenderFeature(joaat("BypassC4Limit"))
+							ClickGUI.RenderFeature(joaat("AllowAllWeaponsDriveBy"))
+							ClickGUI.RenderFeature(joaat("FillAmmoOnWeaponChange"))							
+							ClickGUI.RenderFeature(joaat("InvisibleWeapon"))							
+							ClickGUI.EndCustomChildWindow() 
+						end	
+					else
+						if ClickGUI.BeginCustomChildWindow("Fun Guns") then	
+							ClickGUI.RenderFeature(joaat("TeleportGun"))
+							ClickGUI.RenderFeature(joaat("GrappleGun"))
+							ClickGUI.RenderFeature(joaat("AirstrikeGun"))
+							ClickGUI.RenderFeature(joaat("ReviveGun"))
+							ClickGUI.RenderFeature(joaat("ShrinkGun"))
+							ClickGUI.RenderFeature(joaat("DriveGun"))
+							ClickGUI.RenderFeature(joaat("SoulSwitchGun"))
+							ClickGUI.RenderFeature(joaat("GravityGun"))
+							ClickGUI.RenderFeature(joaat("DeleteGun"))
+							ClickGUI.RenderFeature(joaat("PedGun"))
+							ClickGUI.RenderFeature(joaat("BlockGun"))
+							ClickGUI.EndCustomChildWindow() 
+						end																				
+					end
+				end
+				ImGui.EndTable()
+			end
+			ImGui.EndTabItem()
+		end
+		ImGui.EndTabBar()
+	end
+end
+function addListUIFeatures(cat, tab)
+	for i=1,#allweaponCatsAndNames[cat] do
+		local thisHash, thisName = allweaponCatsAndNames[cat][i][1], tostring(allweaponCatsAndNames[cat][i][2])
+		local subTab = tab:AddSubTab(thisName)
+		FeatureMgr.AddFeature(joaat("give" .. thisHash), "Give " .. thisName, eFeatureType.Button, "Will add " .. thisName .. " to your equiped Weapons", function(f) giveWeapon(thisHash) end)
+		FeatureMgr.AddFeature(joaat("remove" .. thisHash), "Remove " .. thisName, eFeatureType.Button, "Will remove " .. thisName .. " from your equiped Weapons", function(f) removeWeapon(thisHash) end)
+		subTab:AddFeature(joaat("give" .. thisHash))
+		subTab:AddFeature(joaat("remove" .. thisHash))		
+		if allWeapons[thisHash].possibleAttachments and type(allWeapons[thisHash].possibleAttachments) == "table" then
+			subTab:AddSeperator()
+			FeatureMgr.AddFeature(joaat("attachmentsCombo" .. thisHash), "Selected Attachment", eFeatureType.Combo, "Current Selected attachment that gets added/removed"):SetList(allWeapons[thisHash].possibleAttachmentNames)
+			FeatureMgr.AddFeature(joaat("addAttachment" .. thisHash), "Add Attachment", eFeatureType.Button, "Adds the selected Camo", function()
+				local index = FeatureMgr.GetFeature(joaat("attachmentsCombo" .. thisHash)):GetListIndex()+1
+				Natives.InvokeVoid(0xD966D51AA5B28BB9, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].possibleAttachments[index][1]) )-- [1][1] -> index 1, hash
+			end)
+			FeatureMgr.AddFeature(joaat("removeAttachment" .. thisHash), "Remove Attachment", eFeatureType.Button, "Adds the selected Camo", function()
+				local index = FeatureMgr.GetFeature(joaat("attachmentsCombo" .. thisHash)):GetListIndex()+1
+				Natives.InvokeVoid(0x1E8BE90C74FB4C09, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].possibleAttachments[index][1]) )-- [1][1] -> index 1, hash
+			end)
+			subTab:AddFeature(joaat("attachmentsCombo" .. thisHash))
+			subTab:AddFeature(joaat("addAttachment" .. thisHash))
+			subTab:AddFeature(joaat("removeAttachment" .. thisHash))
+			FeatureMgr.GetFeature(joaat("addAttachment" .. thisHash)).Name = "Add###addAttachment" .. thisHash
+			FeatureMgr.GetFeature(joaat("removeAttachment" .. thisHash)).Name = "Remove###removeAttachment" .. thisHash
+		end
+		if allWeapons[thisHash].tintType ~= "none" then			
+			subTab:AddSeperator()
+			FeatureMgr.AddFeature(joaat("tintCombo" .. thisHash), "Selected Tint", eFeatureType.Combo, "The tint that will be set"):SetList(_G[allWeapons[thisHash].tintType])
+			FeatureMgr.AddFeature(joaat("setTint" .. thisHash), "Set", eFeatureType.Button, "Sets the selected Tint", function(f)
+				local index = FeatureMgr.GetFeature(joaat("tintCombo" .. thisHash)):GetListIndex()
+				Natives.InvokeVoid(0x50969B9B89ED5738, myHandle(), joaat(thisHash), index)
+			end)
+			subTab:AddFeature(joaat("tintCombo" .. thisHash))
+			subTab:AddFeature(joaat("setTint" .. thisHash))
+			FeatureMgr.GetFeature(joaat("tintCombo" .. thisHash)).Name = "###SelectedTint" -- can rename as it wont update after its added (only in clickui)
+		end
+		if allWeapons[thisHash].possibleCamoNames then
+			subTab:AddSeperator()
+			FeatureMgr.AddFeature(joaat("camoCombo" .. thisHash), "Selected Camo", eFeatureType.Combo, "Camo that will be added/removed", function(f)
+				allWeapons[thisHash].camoSelcted = f:GetListIndex()+1
+			end):SetList(allWeapons[thisHash].possibleCamoNames)
+			FeatureMgr.AddFeature(joaat("addCamo" .. thisHash), "Add Camo", eFeatureType.Button, "Adds the selected Camo", function()
+				local index = FeatureMgr.GetFeature(joaat("camoCombo" .. thisHash)):GetListIndex()+1
+				Natives.InvokeVoid(0xD966D51AA5B28BB9, myHandle(), joaat(thisHash),joaat(allWeapons[thisHash].possibleCamos[index][1]))
+			end)
+			FeatureMgr.AddFeature(joaat("removeCamo" .. thisHash), "Remove Camo", eFeatureType.Button, "Adds the selected Camo", function()
+				local index = FeatureMgr.GetFeature(joaat("camoCombo" .. thisHash)):GetListIndex()+1
+				Natives.InvokeVoid(0x1E8BE90C74FB4C09, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].possibleCamos[index][1]))
+			end)
+			if #allWeapons[thisHash].possibleCamos == 1 then
+				-- if only 1 then i dont need the combo				
+				-- so i can also change the add / remove buttons for clickui as it wont change in listui
+				-- very real
+				FeatureMgr.GetFeature(joaat("addCamo" .. thisHash)).Name = "Add " .. allWeapons[thisHash].possibleCamoNames[1]
+				FeatureMgr.GetFeature(joaat("removeCamo" .. thisHash)).Name = "Remove " .. allWeapons[thisHash].possibleCamoNames[1]
+			else
+				subTab:AddFeature(joaat("camoCombo" .. thisHash))
+				FeatureMgr.GetFeature(joaat("camoCombo" .. thisHash)).Name = "###camoCombo" .. thisHash
+			end
+			subTab:AddFeature(joaat("addCamo" .. thisHash))
+			subTab:AddFeature(joaat("removeCamo" .. thisHash))
+		end
+		if allWeapons[thisHash].tintType == "tintsMK2s" and allWeapons[thisHash].camoEquipped ~= -1 then
+			subTab:AddSeperator()
+			FeatureMgr.AddFeature(joaat("mk2TintsCombo" .. thisHash), "Selected Camo tint", eFeatureType.Combo, "Selected Camo tint type for MK2 camos"):SetList(liveryColorsMK2)
+			FeatureMgr.AddFeature(joaat("mk2TintsSet" .. thisHash), "set", eFeatureType.Button, "Sets the selected Camo tint type for MK2 camos", function()
+				local index = FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. thisHash)):GetListIndex()
+				Natives.InvokeVoid(0x9FE5633880ECD8ED, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].camoEquipped[1]), index)
+			end)
+			subTab:AddFeature(joaat("mk2TintsCombo" .. thisHash))
+			subTab:AddFeature(joaat("mk2TintsSet" .. thisHash))
+			FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. thisHash)).Name = "###mk2CamoCombo" .. thisHash
+		end
+	end
+end
+
+qJob(function()		
+	for c in pairs(allweaponCatsAndNames) do
+		for i=1,#allweaponCatsAndNames[c] do
+			-- allweaponCatsAndNames[c] = s_l_mgs, pistols, ...
+			-- allweaponCatsAndNames[c][i] = {"weapon_sniperrifle", "Sniper Rifle"}, {"weapon_compactlauncher", "Compact Grenade Launcher"}, ...
+			wn = allweaponCatsAndNames[c][i][1] -- dont want to copy pasta over and over again :Trol:
+			local CurrWeapHash = joaat(allweaponCatsAndNames[c][i][1]) -- same for hash
+			allWeapons[wn] = {} -- create table for every weapon
+			if #allWeapons > 0 then Logger.Log(eLogColor.CYAN, "SUCCES", "Niceballs") end
+			allWeapons[wn].tintType = Natives.InvokeInt(0x5DCF6C5CAB2E9BF7, CurrWeapHash)
+			if allWeapons[wn].tintType == 1 then
+				allWeapons[wn].tintType = "none" -- weapon_doubleaction says 1 for some reason but has none :kekw
+			elseif allWeapons[wn].tintType == 7 then
+				allWeapons[wn].tintType = "tintsRays"
+			elseif allWeapons[wn].tintType == 8 then
+				allWeapons[wn].tintType = "tintsNormal"
+			elseif allWeapons[wn].tintType == 33 then
+				allWeapons[wn].tintType = "tintsMK2s"
+				allWeapons[wn].camoTintSelected = 1 -- tint for MK2 camo (imgui)
+				allWeapons[wn].camoTintEquipped = -1 -- only used for saving if its an mk2 weapon
+			else
+				Logger.LogError("[IWT] Unknown Weapon Tints " .. allweaponCatsAndNames[c][i][1] .. " | " .. allWeapons[wn].tintType)
+				allWeapons[wn].tintType = "unk"
+			end
+			allWeapons[wn].tintSelected = 1 -- normal tint (imgui)
+			allWeapons[wn].tintEquipped = 1 
+			allWeapons[wn].camoSelcted = 1 -- normal camo (imgui)
+			allWeapons[wn].attachmentSelcted = 1 -- attachment index (imgui)
+			----------------------------------------------------------------------------------------------------------
+			for j=1,#allWeaponComponents do			
+				if Natives.InvokeBool(0x5CEE3DF569CECAB0, CurrWeapHash, joaat(allWeaponComponents[j][1])) then
+					if string.match(allWeaponComponents[j][1], "CAMO") or string.match(allWeaponComponents[j][1], "VARMOD") then
+						if not allWeapons[wn].possibleCamos then 
+							allWeapons[wn].possibleCamos = {} 
+							allWeapons[wn].possibleCamoNames = {} 
+							allWeapons[wn].camoEquipped = {} -- current equipped camo {hashname, name}
+						end -- create table if it doesnt exist
+						table.insert(allWeapons[wn].possibleCamos, allWeaponComponents[j])
+						table.insert(allWeapons[wn].possibleCamoNames, allWeaponComponents[j][2]) -- needed for combo feat smh
+					else
+						if not allWeapons[wn].possibleAttachments then
+							allWeapons[wn].possibleAttachments = {}
+							allWeapons[wn].possibleAttachmentNames = {}
+							allWeapons[wn].currentAttachments = {}
+						end
+						table.insert(allWeapons[wn].possibleAttachments, allWeaponComponents[j])
+						table.insert(allWeapons[wn].possibleAttachmentNames, allWeaponComponents[j][2])
+					end
+				end
+			end
+		end
+	end
+	-- call that shi once at the start
+	if FeatureMgr.IsFeatureEnabled(joaat("AutoLoadLoadout")) then
+		giveLoadOut()
+	end
+	if FeatureMgr.IsFeatureEnabled(joaat("AutoGiveAllWeaopns")) then
+		forAllWeaponsDo("give")
+	end
+	------------------------------
+	-- list ui
+	local rootTab = ListGUI.GetRootTab()
+	if rootTab then
+		local maintab = rootTab:AddSubTab("Better Weapons", "Weapon Manager and Cherax's Weapon features")
+		if maintab then
+			local managerTab = maintab:AddSubTab("Weapon Manager", "Weapon Manager")
+			if managerTab then
+				local assaultTab = managerTab:AddSubTab("Assault Rifles")
+				if assaultTab then
+					addListUIFeatures("assault_rifles", assaultTab)
+				end
+				local sniperTab = managerTab:AddSubTab("Sniper Rifles")
+				if sniperTab then
+					addListUIFeatures("sniper_rifles", sniperTab)
+				end
+				local meeleTab = managerTab:AddSubTab("Meele Weapons")
+				if meeleTab then
+					addListUIFeatures("melees", meeleTab)
+				end
+				local shotgunTab = managerTab:AddSubTab("Shotguns")
+				if shotgunTab then
+					addListUIFeatures("shotguns", shotgunTab)
+				end
+				local heavyTab = managerTab:AddSubTab("Heavy Weapons")
+				if heavyTab then
+					addListUIFeatures("heavys", heavyTab)
+				end
+				local grenadesTab = managerTab:AddSubTab("Grenades")
+				if grenadesTab then
+					addListUIFeatures("nades", grenadesTab)
+				end
+				local pistolTab = managerTab:AddSubTab("Pistols")
+				if pistolTab then
+					addListUIFeatures("pistols", pistolTab)
+				end
+				local smgTab = managerTab:AddSubTab("S/LMGs")
+				if smgTab then
+					addListUIFeatures("s_l_mgs", smgTab)
+				end	
+				local aimbotTab = maintab:AddSubTab("Aimbot", "Cherax's Aimbot features")
+				if aimbotTab then
+					aimbotTab:AddFeature(joaat("AimbotEnabled"))							
+					aimbotTab:AddSeperator()
+					aimbotTab:AddFeature(joaat("AimbotKey"))
+					aimbotTab:AddFeature(joaat("AimbotTargetMode"))
+					aimbotTab:AddFeature(joaat("AimbotTargetBone"))
+					aimbotTab:AddSeperator()
+					aimbotTab:AddFeature(2142674441) -- Bulletprediciton
+					aimbotTab:AddFeature(415855969) -- frame predicion
+					aimbotTab:AddFeature(joaat("AimbotVisibleCheck"))
+					aimbotTab:AddFeature(joaat("AimbotShowLockedOn"))							
+					aimbotTab:AddSeperator()
+					aimbotTab:AddFeature(joaat("AimbotShootDead"))
+					aimbotTab:AddFeature(joaat("AimbotShootNPCs"))
+					aimbotTab:AddFeature(joaat("AimbotShootCops"))
+					aimbotTab:AddFeature(joaat("AimbotShootPlayers"))
+					aimbotTab:AddFeature(joaat("AimbotFriendlyFire"))
+					aimbotTab:AddFeature(joaat("AimbotAutoDistance"))
+					aimbotTab:AddFeature(joaat("AimbotDistance"))
+					aimbotTab:AddSeperator()
+					aimbotTab:AddFeature(joaat("AimbotDrawFOV"))
+					aimbotTab:AddFeature(joaat("AimbotFOV"))
+					aimbotTab:AddFeature(joaat("AimbotCircleColor"))
+					aimbotTab:AddSeperator()
+					aimbotTab:AddFeature(joaat("AimbotTargetSwitchDelay"))
+					aimbotTab:AddFeature(joaat("AimbotSmoothAim"))
+					aimbotTab:AddSeperator()
+					aimbotTab:AddFeature(joaat("AimbotDeadZone"))
+					aimbotTab:AddFeature(joaat("AimbotShowDeadZone"))							
+					aimbotTab:AddFeature(joaat("AimbotDeadZoneRadius"))
+					aimbotTab:AddSeperator()							
+					aimbotTab:AddFeature(joaat("AimbotSilentBullets"))
+					aimbotTab:AddFeature(joaat("AimbotSilentMagicBullets"))
+					aimbotTab:AddFeature(joaat("AimbotDrawSilentFOV"))
+					aimbotTab:AddFeature(joaat("AimbotSilentFOV"))
+				end
+				local miscTab = maintab:AddSubTab("Misc", "All the other features")
+				if miscTab then
+					miscTab:AddFeature(joaat("CustomImpactType"))
+					miscTab:AddFeature(joaat("CustomImpact"))
+					miscTab:AddFeature(joaat("giveWeaponPara"))
+					miscTab:AddFeature(joaat("RapidFire"))
+					miscTab:AddFeature(445878866) -- unlimited range
+					miscTab:AddFeature(joaat("InstantLockOn"))
+					miscTab:AddFeature(joaat("BypassC4Limit"))
+					miscTab:AddFeature(joaat("AllowAllWeaponsDriveBy"))
+					miscTab:AddFeature(joaat("FillAmmoOnWeaponChange"))							
+					miscTab:AddFeature(joaat("InvisibleWeapon"))							
+					miscTab:AddFeature(joaat("TeleportGun"))
+					miscTab:AddFeature(joaat("GrappleGun"))
+					miscTab:AddFeature(joaat("AirstrikeGun"))
+					miscTab:AddFeature(joaat("ReviveGun"))
+					miscTab:AddFeature(joaat("ShrinkGun"))
+					miscTab:AddFeature(joaat("DriveGun"))
+					miscTab:AddFeature(joaat("SoulSwitchGun"))
+					miscTab:AddFeature(joaat("GravityGun"))
+					miscTab:AddFeature(joaat("DeleteGun"))
+					miscTab:AddFeature(joaat("PedGun"))
+					miscTab:AddFeature(joaat("BlockGun"))
+					miscTab:AddFeature(950937895)
+					miscTab:AddFeature(1266914962)
+					miscTab:AddFeature(378227101)
+					miscTab:AddFeature(851365501)
+					miscTab:AddFeature(2593851087)
+					miscTab:AddFeature(4252099700)
+					miscTab:AddFeature(3846859030)
+					miscTab:AddFeature(2885146915)
+				end
+			end
+		end
+	end
+	Script.RegisterLooped(function()
+		GetWeaponStuff()
+		yield(420)
+	end)
+end)
+EventMgr.RegisterHandler(eLuaEvent.ON_SESSION_CHANGE, function()
+	qJob(function()
+		if not Natives.InvokeBool(0x9DE624D2FC4B603F) then -- dont wait for valid ped if loaded in story mode
+	 		goto doshitsmh
+		end
+		while not ShouldUnload() do
+			yield(10)
+			local v = GTA.GetLocalPed():GetVelocity()
+			if v.x ~= 0.0 and v.y ~= 0.0 and v.z ~= 0.0 then			
+				break
+			end
+			-- the following works too, but the remove all weapons for the loadout wont work correctly
+			--if GTA.GetLocalPed() and GTA.GetLocalPed() ~= 0 then
+			--	break
+			--end
+		end
+		::doshitsmh::
+		if FeatureMgr.IsFeatureEnabled(joaat("AutoLoadLoadout")) then
+			giveLoadOut()
+		end
+		if FeatureMgr.IsFeatureEnabled(joaat("AutoGiveAllWeaopns")) then
+			forAllWeaponsDo("give")
+		end
+		Logger.LogInfo("Joined a New Session")
+	end)
+end)
+
+--------------------------------------------
+ClickGUI.AddTab("Better Weapons", clickGUI)
