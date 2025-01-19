@@ -1,1525 +1,793 @@
-joaat = Utils.Joaat
-yield = Script.Yield
-qJob = Script.QueueJob
-function myHandle()
-	return GTA.PointerToHandle(CPhysical.FromAddress(GTA.GetLocalPed():GetAddress()))
-end
-allweaponCatsAndNames = {
-	--Assault Riffles:
-	["assault_rifles"] = {
-		{"weapon_assaultrifle", "Assault Rifle"},
-		{"weapon_assaultrifle_mk2", "Assault Rifle Mk II"},
-		{"weapon_bullpuprifle", "Bullpup Rifle"},
-		{"weapon_bullpuprifle_mk2", "Bullpup Rifle Mk II"},
-		{"weapon_carbinerifle", "Carbine Rifle"},
-		{"weapon_carbinerifle_mk2", "Carbine Rifle Mk II"},
-		{"weapon_compactrifle", "Compact Rifle"},
-		{"weapon_specialcarbine", "Special Carbine"},
-		{"weapon_specialcarbine_mk2", "Special Carbine Mk II"},
-		{"weapon_advancedrifle", "Advanced Rifle"},
-		{"weapon_heavyrifle", "Heavy Rifle"},
-		{"weapon_militaryrifle", "Military Rifle"},
-		{"weapon_tacticalrifle", "Service Rifle"}
-	},
-	--Sniper Rifles:
-	["sniper_rifles"] = {
-		{"weapon_sniperrifle", "Sniper Rifle"},
-		{"weapon_heavysniper", "Heavy Sniper"},
-		{"weapon_heavysniper_mk2", "Heavy Sniper Mk II"},
-		{"weapon_marksmanrifle", "Marksman Rifle"},
-		{"weapon_marksmanrifle_mk2", "Marksman Rifle Mk II"},
-		{"weapon_precisionrifle", "Precision Rifle"}
-	},
-	--Meele:
-	["melees"] = {
-		{"weapon_knife", "Knife"},
-		{"weapon_bat", "Baseball Bat"},
-		{"weapon_battleaxe", "Battle Axe"},
-		{"weapon_bottle", "Bottle"},
-		{"weapon_crowbar", "Crowbar"},
-		{"weapon_dagger", "Antique Cavalry Dagger"},
-		{"weapon_flashlight", "Flashlight"},
-		{"weapon_hammer", "Hammer"},
-		{"weapon_hatchet", "Hatchet"},
-		{"weapon_knuckle", "Knuckle Duster"},
-		{"weapon_machete", "Machete"},
-		{"weapon_nightstick", "Nightstick"},
-		{"weapon_poolcue", "Pool Cue"},
-		{"weapon_switchblade", "Switchblade"},
-		{"weapon_wrench", "Pipe Wrench"},
-		{"weapon_stone_hatchet", "Stone Hatchet"},
-		{"weapon_golfclub", "Golf Club"}
-	},
-	--Shotguns:
-	["shotguns"] = {
-		{"weapon_assaultshotgun", "Assault Shotgun"},
-		{"weapon_autoshotgun", "Sweeper Shotgun"},
-		{"weapon_bullpupshotgun", "Bullpup Shotgun"},
-		{"weapon_dbshotgun", "Double Barrel Shotgun"},
-		{"weapon_heavyshotgun", "Heavy Shotgun"},
-		{"weapon_pumpshotgun", "Pump Shotgun"},
-		{"weapon_pumpshotgun_mk2", "Pump Shotgun Mk II"},
-		{"weapon_sawnoffshotgun", "Sawed-Off Shotgun"},
-		{"weapon_musket", "Musket"}
-	},
-	--Heavy:
-	["heavys"] = {
-		{"weapon_compactlauncher", "Compact Grenade Launcher"},
-		{"weapon_firework", "Firework Launcher"},
-		{"weapon_grenadelauncher", "Grenade Launcher"},
-		{"weapon_hominglauncher", "Homing Launcher"},
-		{"weapon_minigun", "Minigun"},
-		{"weapon_railgun", "Railgun"},
-		{"weapon_rpg", "RPG"},
-		{"weapon_rayminigun", "Widowmaker"},
-		{"weapon_emplauncher", "Compact EMP Launcher"}
-	},
-	--Nades:
-	["nades"] = {
-		{"weapon_ball", "Ball"},
-		{"weapon_bzgas", "BZ Gas"},
-		{"weapon_flare", "Flare"},
-		{"weapon_grenade", "Grenade"},
-		{"weapon_molotov", "Molotov"},
-		{"weapon_pipebomb", "Pipe Bomb"},
-		{"weapon_proxmine", "Proximity Mine"},
-		{"weapon_smokegrenade", "Tear Gas"},
-		{"weapon_snowball", "Snowball"},
-		{"weapon_stickybomb", "Sticky Bomb"},
-		{"weapon_fireextinguisher", "Fire Extinguisher"},
-		{"weapon_hazardcan", "Hazard Can"},
-		{"weapon_petrolcan", "Jerry Can"}
-	},
-
-	--Pistols:
-	["pistols"] = {
-		{"weapon_appistol", "AP Pistol"},
-		{"weapon_combatpistol", "Combat Pistol"},
-		{"weapon_doubleaction", "Double-Action Revolver"},
-		{"weapon_flaregun", "Flare Gun"},
-		{"weapon_heavypistol", "Heavy Pistol"},
-		{"weapon_machinepistol", "Machine Pistol"}, -- smg?
-		{"weapon_pistol", "Pistol"},
-		{"weapon_pistol_mk2", "Pistol Mk II"},
-		{"weapon_pistol50", "Pistol .50"},
-		{"weapon_revolver", "Heavy Revolver"},
-		{"weapon_revolver_mk2", "Heavy Revolver Mk II"},
-		{"weapon_snspistol", "SNS Pistol"},
-		{"weapon_snspistol_mk2", "SNS Pistol Mk II"},
-		{"weapon_vintagepistol", "Vintage Pistol"},
-		{"weapon_marksmanpistol", "Marksman Pistol"},
-		{"weapon_raypistol", "Up-n-Atomizer"},
-		{"weapon_stungun", "Stun Gun"},
-		{"weapon_stungun_mp", "Stun Gun MP"},
-		{"weapon_metaldetector", "Metaldetector"},
-		{"weapon_digiscanner", "digiscanner"},	
-	},
-	--LMGs
-	["s_l_mgs"] = {
-		{"weapon_combatmg", "Combat MG"},
-		{"weapon_combatmg_mk2", "Combat MG Mk II"},
-		{"weapon_gusenberg", "Gusenberg Sweeper"},
-		{"weapon_mg", "MG"},
-		{"weapon_raycarbine", "Unholy Hellbringer"},
-		--SMGs
-		{"weapon_assaultsmg", "Assault SMG"},
-		{"weapon_combatpdw", "Combat PDW"},		
-		{"weapon_microsmg", "Micro SMG"},
-		{"weapon_minismg", "Mini SMG"},
-		{"weapon_smg", "SMG"},
-		{"weapon_smg_mk2", "SMG Mk II"},
-		{"WEAPON_TECPISTOL", "Tactical SMG"}
-	}
-}
-
-allWeaponComponents = {
-	--WEAPON_TECPISTOL
-	{"COMPONENT_TECPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_TECPISTOL_CLIP_02", "Extended Clip"},
-
-	-- Knuckel
-	{"COMPONENT_KNUCKLE_VARMOD_BASE", "Base Model"},
-	{"COMPONENT_KNUCKLE_VARMOD_PIMP", "The Pimp"},
-	{"COMPONENT_KNUCKLE_VARMOD_BALLAS", "The Ballas"},
-	{"COMPONENT_KNUCKLE_VARMOD_DOLLAR", "The Hustler"},
-	{"COMPONENT_KNUCKLE_VARMOD_DIAMOND", "The Rock"},
-	{"COMPONENT_KNUCKLE_VARMOD_HATE", "The Hater"},
-	{"COMPONENT_KNUCKLE_VARMOD_LOVE", "The Lover"},
-	{"COMPONENT_KNUCKLE_VARMOD_PLAYER", "The Player"},
-	{"COMPONENT_KNUCKLE_VARMOD_KING", "The King"},
-	{"COMPONENT_KNUCKLE_VARMOD_VAGOS", "The Vagos"},
-
-	-- Switchblade
-	{"COMPONENT_SWITCHBLADE_VARMOD_BASE", "Default Handle"},
-	{"COMPONENT_SWITCHBLADE_VARMOD_VAR1", "VIP Variant"},
-	{"COMPONENT_SWITCHBLADE_VARMOD_VAR2", "Bodyguard Variant"},
-
-	-- For multiple weapons
-	{"COMPONENT_AT_PI_SUPP", "Suppressor"},
-	{"COMPONENT_AT_PI_SUPP_02", "Suppressor"},
-	{"COMPONENT_AT_AR_SUPP_02", "Suppressor"},
-	{"COMPONENT_AT_SR_SUPP_03", "Suppressor"},
-	{"COMPONENT_AT_AR_SUPP", "Suppressor"},
-	{"COMPONENT_AT_PI_FLSH", "Flashlight"},
-	{"COMPONENT_AT_AR_FLSH", "Flashlight"},
-	
-	{"COMPONENT_AT_MUZZLE_01", "Flat Muzzle Brake"},
-	{"COMPONENT_AT_MUZZLE_02", "Tactical Muzzle Brake"},
-	{"COMPONENT_AT_MUZZLE_03", "Fat-End Muzzle Brake"},
-	{"COMPONENT_AT_MUZZLE_04", "Precision Muzzle Brake"},
-	{"COMPONENT_AT_MUZZLE_05", "Heavy Duty Muzzle Brake"},
-	{"COMPONENT_AT_MUZZLE_06", "Slanted Muzzle Brake"},
-	{"COMPONENT_AT_MUZZLE_07", "Split-End Muzzle Brake"},
-	{"COMPONENT_AT_MUZZLE_08", "Squared Muzzle Brake"},
-	
-	{"COMPONENT_AT_AR_AFGRIP_02", "Grip"},
-	{"COMPONENT_AT_AR_AFGRIP", "Grip"},
-
-	{"COMPONENT_AT_SIGHTS", "Holographic Sight"},
-	{"COMPONENT_AT_SCOPE_MACRO_MK2", "Small Scope"},
-	{"COMPONENT_AT_SCOPE_MACRO", "Scope"},
-	{"COMPONENT_AT_SCOPE_SMALL", "Scope"},
-	{"COMPONENT_AT_SCOPE_MEDIUM", "Scope"},
-	{"COMPONENT_AT_SCOPE_SMALL_MK2", "Medium Scope"},	
-	{"COMPONENT_AT_SCOPE_MEDIUM_MK2", "Large Scope"},
-	{"COMPONENT_AT_SCOPE_LARGE", "Scope"},
-	{"COMPONENT_AT_SCOPE_MAX", "Advanced Scope"},
-
-
-	-- pistol
-	{"COMPONENT_PISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_PISTOL_CLIP_02", "Extended Clip"},
-	{"COMPONENT_PISTOL_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
-
-	-- combat pistol
-	{"COMPONENT_COMBATPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_COMBATPISTOL_CLIP_02", "Extended Clip"},
-	{"COMPONENT_COMBATPISTOL_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish"},
-
-	-- ap pistol
-	{"COMPONENT_APPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_APPISTOL_CLIP_02", "Extended Clip"},
-	{"COMPONENT_APPISTOL_VARMOD_LUXE", "Gilded Gun Metal Finish"},
-
-	-- deagle
-	{"COMPONENT_PISTOL50_CLIP_01", "Default Clip"},
-	{"COMPONENT_PISTOL50_CLIP_02", "Extended Clip"},
-	{"COMPONENT_PISTOL50_VARMOD_LUXE", "Platinum Pearl Deluxe Finish"},
-
-	-- Heavy Revolver
-	{"COMPONENT_REVOLVER_CLIP_01", "Default Clip"},
-	{"COMPONENT_REVOLVER_VARMOD_GOON", "Bodyguard Variant"},
-	{"COMPONENT_REVOLVER_VARMOD_BOSS", "VIP Variant"},
-
-	-- SNS Pistol
-	{"COMPONENT_SNSPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_SNSPISTOL_CLIP_02", "Extended Clip"},
-	{"COMPONENT_SNSPISTOL_VARMOD_LOWRIDER", "Etched Wood Grip Finish"},
-
-	-- heavy pist
-	{"COMPONENT_HEAVYPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_HEAVYPISTOL_CLIP_02", "Extended Clip"},
-	{"COMPONENT_HEAVYPISTOL_VARMOD_LUXE", "Etched Wood Grip Finish"},
-
-	-- heavvy rev mk2
-	{"COMPONENT_REVOLVER_MK2_CLIP_01", "Default Rounds"},
-	{"COMPONENT_REVOLVER_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_REVOLVER_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_REVOLVER_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
-	{"COMPONENT_REVOLVER_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_AT_PI_COMP_03", "Compensator"},
-	{"COMPONENT_REVOLVER_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_REVOLVER_MK2_CAMO_IND_01", "Patriotic"},
-
-	-- SNS pistol
-	{"COMPONENT_SNSPISTOL_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_SNSPISTOL_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_SNSPISTOL_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_SNSPISTOL_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_SNSPISTOL_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
-	{"COMPONENT_SNSPISTOL_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_AT_PI_FLSH_03", "Flashlight"},
-	{"COMPONENT_AT_PI_RAIL_02", "Mounted Scope"},
-	{"COMPONENT_AT_PI_COMP_02", "Compensator"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO", "Digital Camo 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_02", "Brushstroke Camo 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_03", "Woodland Camo 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_04", "Skull 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_05", "Sessanta Nove 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_06", "Perseus 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_07", "Leopard 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_08", "Zebra 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_09", "Geometric 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_10", "Boom! 1"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_IND_01", "Boom! 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_SLIDE", "Digital Camo 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_02_SLIDE", "Brushstroke Camo 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_03_SLIDE", "Woodland Camo 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_04_SLIDE", "Skull 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_05_SLIDE", "Sessanta Nove 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_06_SLIDE", "Perseus 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_07_SLIDE", "Leopard 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_08_SLIDE", "Zebra 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_09_SLIDE", "Geometric 2"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_10_SLIDE", "Boom! 3"},
-	{"COMPONENT_SNSPISTOL_MK2_CAMO_IND_01_SLIDE", "Patriotic"},
-
-	-- Pistol mk2
-	{"COMPONENT_PISTOL_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_PISTOL_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_PISTOL_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_PISTOL_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_PISTOL_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
-	{"COMPONENT_PISTOL_MK2_CLIP_FMJ", "Full Metal Jacket Rounds "},
-	{"COMPONENT_AT_PI_RAIL", "Mounted Scope"},
-	{"COMPONENT_AT_PI_FLSH_02", "Flashlight"},
-	{"COMPONENT_AT_PI_COMP", "Compensator"},
-	{"COMPONENT_PISTOL_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_PISTOL_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_PISTOL_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_PISTOL_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_PISTOL_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_PISTOL_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_PISTOL_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_PISTOL_MK2_CAMO_IND_01", "Patriotic"},
-	{"COMPONENT_PISTOL_MK2_CAMO_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_02_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_03_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_04_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_05_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_06_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_07_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_08_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_09_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_10_SLIDE", "Digital Camo"},
-	{"COMPONENT_PISTOL_MK2_CAMO_IND_01_SLIDE", "Patriotic"},
-
-	 -- Vintage Pistol
-	{"COMPONENT_VINTAGEPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_VINTAGEPISTOL_CLIP_02", "Extended Clip"},
-
-	 -- Up-n-Atomizer
-	{"COMPONENT_RAYPISTOL_VARMOD_XMAS18", "Festive tint"},
-
-	 -- Ceramic Pistol
-	{"COMPONENT_CERAMICPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_CERAMICPISTOL_CLIP_02", "Extended Clip"},
-	{"COMPONENT_CERAMICPISTOL_SUPP", "Suppressor"},
-
-	 -- Micro SMG
-	{"COMPONENT_MICROSMG_CLIP_01", "Default Clip"},
-	{"COMPONENT_MICROSMG_CLIP_02", "Extended Clip"},
-	{"COMPONENT_MICROSMG_VARMOD_LUXE", "Yusuf Amir Luxury Finish "},
-
-	 -- SMG
-	{"COMPONENT_SMG_CLIP_01", "Default Clip"},
-	{"COMPONENT_SMG_CLIP_02", "Extended Clip"},
-	{"COMPONENT_SMG_CLIP_03", "Drum Magazine"},
-	{"COMPONENT_AT_SCOPE_MACRO_02", "Scope"},
-	{"COMPONENT_SMG_VARMOD_LUXE", "Yusuf Amir Luxury Finish "},
-
-	 -- Assault SMG
-	{"COMPONENT_ASSAULTSMG_CLIP_01", "Default Clip"},
-	{"COMPONENT_ASSAULTSMG_CLIP_02", "Extended Clip"},
-	{"COMPONENT_ASSAULTSMG_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish "},
-
-	 -- Mini SMG
-	{"COMPONENT_MINISMG_CLIP_01", "Default Clip"},
-	{"COMPONENT_MINISMG_CLIP_02", "Extended Clip"},
-
-	 -- SMG Mk II
-	{"COMPONENT_SMG_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_SMG_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_SMG_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_SMG_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_SMG_MK2_CLIP_HOLLOWPOINT", "Hollow Point Rounds"},
-	{"COMPONENT_SMG_MK2_CLIP_FMJ", "Full Metal Jacket Rounds "},
-	{"COMPONENT_AT_SIGHTS_SMG", "Holographic Sight"},
-	{"COMPONENT_AT_SCOPE_MACRO_02_SMG_MK2", "Small Scope"},
-	{"COMPONENT_AT_SCOPE_SMALL_SMG_MK2", "Medium Scope"},
-	{"COMPONENT_AT_SB_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_SB_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_SMG_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_SMG_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_SMG_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_SMG_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_SMG_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_SMG_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_SMG_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_SMG_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_SMG_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_SMG_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_SMG_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Machine Pistol
-	{"COMPONENT_MACHINEPISTOL_CLIP_01", "Default Clip"},
-	{"COMPONENT_MACHINEPISTOL_CLIP_02", "Extended Clip"},
-	{"COMPONENT_MACHINEPISTOL_CLIP_03", "Drum Magazine"},
-
-	 -- Combat PDW
-	{"COMPONENT_COMBATPDW_CLIP_01", "Default Clip"},
-	{"COMPONENT_COMBATPDW_CLIP_02", "Extended Clip"},
-	{"COMPONENT_COMBATPDW_CLIP_03", "Drum Magazine"},
-
-	 -- Pump Shotgun
-	{"COMPONENT_AT_SR_SUPP", "Suppressor"},
-	{"COMPONENT_PUMPSHOTGUN_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish"},
-
-	 -- Sawed-Off Shotgun
-	{"COMPONENT_SAWNOFFSHOTGUN_VARMOD_LUXE", "Gilded Gun Metal Finish"},
-
-	 -- Assault Shotgun
-	{"COMPONENT_ASSAULTSHOTGUN_CLIP_01", "Default Clip"},
-	{"COMPONENT_ASSAULTSHOTGUN_CLIP_02", "Extended Clip"},
-
-	 -- Pump Shotgun Mk II
-	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_01", "Default Shells"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_INCENDIARY", "Dragon's Breath Shells"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_ARMORPIERCING", "Steel Buckshot Shells"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_HOLLOWPOINT", "Flechette Shells"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CLIP_EXPLOSIVE", "Explosive Slugs"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_PUMPSHOTGUN_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Heavy Shotgun
-	{"COMPONENT_HEAVYSHOTGUN_CLIP_01", "Default Clip"},
-	{"COMPONENT_HEAVYSHOTGUN_CLIP_02", "Extended Clip"},
-	{"COMPONENT_HEAVYSHOTGUN_CLIP_03", "Drum Magazine"},
-
-	 -- Assault Rifle
-	{"COMPONENT_ASSAULTRIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_ASSAULTRIFLE_CLIP_02", "Extended Clip"},
-	{"COMPONENT_ASSAULTRIFLE_CLIP_03", "Drum Magazine"},
-	{"COMPONENT_ASSAULTRIFLE_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
-
-	 -- Carbine Rifle
-	{"COMPONENT_CARBINERIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_CARBINERIFLE_CLIP_02", "Extended Clip"},
-	{"COMPONENT_CARBINERIFLE_CLIP_03", "Box Magazine"},
-	{"COMPONENT_CARBINERIFLE_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
-
-	 -- Advanced Rifle
-	{"COMPONENT_ADVANCEDRIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_ADVANCEDRIFLE_CLIP_02", "Extended Clip"},
-	{"COMPONENT_ADVANCEDRIFLE_VARMOD_LUXE", "Gilded Gun Metal Finish"},
-
-	 -- Special Carbine
-	{"COMPONENT_SPECIALCARBINE_CLIP_01", "Default Clip"},
-	{"COMPONENT_SPECIALCARBINE_CLIP_02", "Extended Clip"},
-	{"COMPONENT_SPECIALCARBINE_CLIP_03", "Drum Magazine"},
-	{"COMPONENT_SPECIALCARBINE_VARMOD_LOWRIDER", "Etched Gun Metal Finish"},
-
-	 -- Bullpup Rifle
-	{"COMPONENT_BULLPUPRIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_BULLPUPRIFLE_CLIP_02", "Extended Clip"},
-	{"COMPONENT_BULLPUPRIFLE_VARMOD_LOW", "Gilded Gun Metal Finish"},
-
-	 -- Bullpup Rifle Mk II
-	{"COMPONENT_AT_SCOPE_MACRO_02_MK2", "Small Scope"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},	
-	{"COMPONENT_AT_BP_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_BP_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_BULLPUPRIFLE_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Special Carbine Mk II
-	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_AT_SC_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_SC_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_SPECIALCARBINE_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Assault Rifle Mk II
-	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_AT_AR_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_AR_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_ASSAULTRIFLE_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Carbine Rifle Mk II
-	{"COMPONENT_CARBINERIFLE_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_CARBINERIFLE_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_CARBINERIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_CARBINERIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_CARBINERIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
-	{"COMPONENT_CARBINERIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_AT_CR_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_CR_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_CARBINERIFLE_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Compact Rifle
-	{"COMPONENT_COMPACTRIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_COMPACTRIFLE_CLIP_02", "Extended Clip"},
-	{"COMPONENT_COMPACTRIFLE_CLIP_03", "Drum Magazine"},
-
-	 -- Military Rifle
-	{"COMPONENT_MILITARYRIFLE_SIGHT_01", "Iron Sight"},
-	{"COMPONENT_MILITARYRIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_MILITARYRIFLE_CLIP_02", "Extended Clip"},	
-
-	--Heavy rifle
-	{"COMPONENT_HEAVYRIFLE_CAMO1", "Families Finish"},
-
-	 -- MG
-	{"COMPONENT_AT_SCOPE_SMALL_02", "Scope"},
-	{"COMPONENT_MG_CLIP_01", "Default Clip"},
-	{"COMPONENT_MG_CLIP_02", "Extended Clip"},	
-	{"COMPONENT_MG_VARMOD_LOWRIDER", "Yusuf Amir Luxury Finish"},
-
-	 -- Combat MG
-	{"COMPONENT_COMBATMG_CLIP_01", "Default Clip"},
-	{"COMPONENT_COMBATMG_CLIP_02", "Extended Clip"},
-	{"COMPONENT_COMBATMG_VARMOD_LOWRIDER", "Etched Gun Metal Finish"},
-
-	 -- Combat MG Mk II
-	{"COMPONENT_COMBATMG_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_COMBATMG_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_COMBATMG_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_COMBATMG_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_COMBATMG_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
-	{"COMPONENT_COMBATMG_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_AT_MG_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_MG_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_COMBATMG_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_COMBATMG_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Gusenberg Sweeper
-	{"COMPONENT_GUSENBERG_CLIP_01", "Default Clip"},
-	{"COMPONENT_GUSENBERG_CLIP_02", "Extended Clip"},
-
-	 -- Sniper Rifle
-	{"COMPONENT_SNIPERRIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_SNIPERRIFLE_VARMOD_LUXE", "Etched Wood Grip Finish"},
-
-	 -- Heavy Sniper
-	{"COMPONENT_HEAVYSNIPER_CLIP_01", "Default Clip"},
-
-	 -- Marksman Rifle Mk II
-	{"COMPONENT_AT_SCOPE_LARGE_FIXED_ZOOM_MK2", "Zoom Scope"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_02", "Extended Clip"},	
-	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_TRACER", "Tracer Rounds"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_AT_MRFL_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_MRFL_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_10", "Boom! 1"},
-	{"COMPONENT_MARKSMANRIFLE_MK2_CAMO_IND_01", "Boom! 2"},
-
-	 -- Heavy Sniper Mk II
-	{"COMPONENT_AT_MUZZLE_09", "Bell-End Muzzle Brake"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_01", "Default Clip"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_02", "Extended Clip"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_INCENDIARY", "Incendiary Rounds"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_ARMORPIERCING", "Armor Piercing Rounds"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_FMJ", "Full Metal Jacket Rounds"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CLIP_EXPLOSIVE", "Explosive Rounds"},
-	{"COMPONENT_AT_SCOPE_LARGE_MK2", "Zoom Scope"},
-	{"COMPONENT_AT_SCOPE_NV", "Night Vision Scope"},
-	{"COMPONENT_AT_SCOPE_THERMAL", "Thermal Scope"},	
-	{"COMPONENT_AT_SR_BARREL_01", "Default Barrel"},
-	{"COMPONENT_AT_SR_BARREL_02", "Heavy Barrel"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO", "Digital Camo"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_02", "Brushstroke Camo"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_03", "Woodland Camo"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_04", "Skull"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_05", "Sessanta Nove"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_06", "Perseus"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_07", "Leopard"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_08", "Zebra"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_09", "Geometric"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_10", "Boom!"},
-	{"COMPONENT_HEAVYSNIPER_MK2_CAMO_IND_01", "Patriotic"},
-
-	 -- Marksman Rifle
-	{"COMPONENT_AT_SCOPE_LARGE_FIXED_ZOOM", "Scope"},
-	{"COMPONENT_MARKSMANRIFLE_CLIP_01", "Default Clip"},
-	{"COMPONENT_MARKSMANRIFLE_CLIP_02", "Extended Clip"},	
-	{"COMPONENT_MARKSMANRIFLE_VARMOD_LUXE", "Yusuf Amir Luxury Finish"},
-
-	-- grenade
-	{"COMPONENT_GRENADELAUNCHER_CLIP_01", "Default Clip"}
-}
-weaponCats = {
-	"Assault Rifles",
-	"Sniper Rifles",
-	"Meele Weapons",
-	"Shotguns",
-	"Heavy Weapons",
-	"Grenades",
-	"Pistols",
-	"S/LMGs",
-}
-tintsNormal = {
-	"Default/Black",
-	"Green",
-	"Gold",
-	"Pink",
-	"Army",
-	"LSPD",
-	"Orange",
-	"Platinum"
-}
-tintsRays = {
-	"Default",
-	"Purple",
-	"Green",
-	"Orange",
-	"Pink",
-	"Gold",
-	"Platinum"
-}
-tintsMK2s = {
-	"Classic Black",
-	"Classic Gray",
-	"Classic Two-Tone",
-	"Classic White",
-	"Classic Beige",
-	"Classic Green",
-	"Classic Blue",
-	"Classic Earth",
-	"Classic Brown & Black",
-	"Red Contrast",
-	"Blue Contrast",
-	"Yellow Contrast",
-	"Orange Contrast",
-	"Bold Pink",
-	"Bold Purple & Yellow",
-	"Bold Orange",
-	"Bold Green & Purple",
-	"Bold Red Features",
-	"Bold Green Features",
-	"Bold Cyan Features",
-	"Bold Yellow Features",
-	"Bold Red & White",
-	"Bold Blue & White",
-	"Metallic Gold",
-	"Metallic Platinum",
-	"Metallic Gray & Lilac",
-	"Metallic Purple & Lime",
-	"Metallic Red",
-	"Metallic Green",
-	"Metallic Blue",
-	"Metallic White & Aqua",
-	"Metallic Orange & Yellow",
-	"Mettalic Red and Yellow"
-}
-
-liveryColorsMK2 = {
-	"Gray",
-	"Dark Gray",
-	"Black",
-	"White",
-	"Blue",
-	"Cyan",
-	"Aqua",
-	"Cool Blue",
-	"Dark Blue",
-	"Royal Blue",
-	"Plum",
-	"Dark Purple",
-	"Purple",
-	"Red",
-	"Wine Red",
-	"Magenta",
-	"Pink",
-	"Salmon",
-	"Hot Pink",
-	"Rust Orange",
-	"Brown",
-	"Earth",
-	"Orange",
-	"Light Orange",
-	"Dark Yellow",
-	"Yellow",
-	"Light Brown",
-	"Lime Green",
-	"Olive",
-	"Moss",
-	"Turquoise",
-	"Dark Green"
-}
-
-local allWeapons = {}
-myWeapons = {}
-local function GetWeaponStuff()	
-	local MyPed = myHandle()
-	if MyPed and MyPed ~= 0 then
-		local temp = {}
-		for c in pairs(allweaponCatsAndNames) do
-			for i=1,#allweaponCatsAndNames[c] do
-				if Natives.InvokeBool(0x8DECB02F88F428BC, MyPed, joaat(allweaponCatsAndNames[c][i][1])) then
-					myWeapons[allweaponCatsAndNames[c][i][1]] = allweaponCatsAndNames[c][i][1]
-					FeatureMgr.GetFeature(joaat("give" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-					FeatureMgr.GetFeature(joaat("remove" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleAttachments then
-						FeatureMgr.GetFeature(joaat("attachmentsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-					end
-					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleCamos then
-						FeatureMgr.GetFeature(joaat("camoCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-					end
-					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType ~= "none" then
-						FeatureMgr.GetFeature(joaat("tintCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-						FeatureMgr.GetFeature(joaat("setTint" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-					end
-					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType == "tintsMK2s" then
-						FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-						FeatureMgr.GetFeature(joaat("mk2TintsSet" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-					end
-				else
-					myWeapons[allweaponCatsAndNames[c][i][1]] = nil
-					FeatureMgr.GetFeature(joaat("give" .. allweaponCatsAndNames[c][i][1])):SetVisible(true)
-					FeatureMgr.GetFeature(joaat("remove" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleAttachments then
-						FeatureMgr.GetFeature(joaat("attachmentsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-						FeatureMgr.GetFeature(joaat("addAttachment" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-						FeatureMgr.GetFeature(joaat("removeAttachment" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-					end
-					if allWeapons[allweaponCatsAndNames[c][i][1]].possibleCamos then
-						FeatureMgr.GetFeature(joaat("addCamo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-						FeatureMgr.GetFeature(joaat("removeCamo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-						FeatureMgr.GetFeature(joaat("camoCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-					end
-					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType ~= "none" then
-						FeatureMgr.GetFeature(joaat("tintCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-						FeatureMgr.GetFeature(joaat("setTint" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-					end
-					if allWeapons[allweaponCatsAndNames[c][i][1]].tintType == "tintsMK2s" then
-						FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-						FeatureMgr.GetFeature(joaat("mk2TintsSet" .. allweaponCatsAndNames[c][i][1])):SetVisible(false)
-					end
-				end
-			end
-		end
-		-------------
-		yield()
-		-------------			
-		for i in pairs(myWeapons) do
-			if allWeapons[i].possibleAttachments then
-				local currentComboIndex = FeatureMgr.GetFeature(joaat("attachmentsCombo" .. i)):GetListIndex()+1
-				for att=1,#allWeapons[i].possibleAttachments do
-					if Natives.InvokeBool(0xC593212475FAE340, MyPed, joaat(i), joaat(allWeapons[i].possibleAttachments[att][1])) then
-						table.insert(temp, allWeapons[i].possibleAttachments[att])
-						if allWeapons[i].possibleAttachments[att] == allWeapons[i].possibleAttachments[currentComboIndex] then
-							FeatureMgr.GetFeature(joaat("addAttachment" .. i)):SetVisible(false)
-							FeatureMgr.GetFeature(joaat("removeAttachment" .. i)):SetVisible(true)
-						end
-					else
-						if allWeapons[i].possibleAttachments[att] == allWeapons[i].possibleAttachments[currentComboIndex] then
-							FeatureMgr.GetFeature(joaat("addAttachment" .. i)):SetVisible(true)
-							FeatureMgr.GetFeature(joaat("removeAttachment" .. i)):SetVisible(false)
-						end				
-					end
-				end		
-				allWeapons[i].currentAttachments,temp = temp,{nil}
-			end
-			-------------------------------------------------------
-			if allWeapons[i].possibleCamos then
-				local currentComboIndex = FeatureMgr.GetFeature(joaat("camoCombo" .. i)):GetListIndex()+1
-				for camo=1,#allWeapons[i].possibleCamos do
-					if Natives.InvokeBool(0xC593212475FAE340, MyPed, joaat(i), joaat(allWeapons[i].possibleCamos[camo][1])) then
-						if allWeapons[i].possibleCamos[camo] == allWeapons[i].possibleCamos[currentComboIndex] then
-							FeatureMgr.GetFeature(joaat("addCamo" .. i)):SetVisible(false)
-							FeatureMgr.GetFeature(joaat("removeCamo" .. i)):SetVisible(true)
-						end
-						allWeapons[i].camoEquipped = allWeapons[i].possibleCamos[camo]
-						allWeapons[i].camoTintEquipped = Natives.InvokeInt(0xF0A60040BE558F2D, MyPed, joaat(i), joaat(allWeapons[i].possibleCamos[camo][1]))
-					else
-						if allWeapons[i].possibleCamos[camo] == allWeapons[i].possibleCamos[currentComboIndex] then
-							FeatureMgr.GetFeature(joaat("addCamo" .. i)):SetVisible(true)
-							FeatureMgr.GetFeature(joaat("removeCamo" .. i)):SetVisible(false)
-						end
-						allWeapons[i].camoEquipped = -1
-					end
-				end
-			end
-			allWeapons[i].tintEquipped = Natives.InvokeInt(0x2B9EEDC07BD06B9F, MyPed, joaat(i))
-		end
-		yield(100)
-	end
-end
-function giveLoadOut()
-	local LoadoutPath = FileMgr.GetMenuRootPath() .. "\\Lua\\resources\\loadout.txt"
-	if not FileMgr.DoesFileExist(LoadoutPath) then Logger.LogInfo("No loadout file") return end
-	local lo = FileMgr.ReadFileContent(LoadoutPath)
-	-- very basic check if there is any weird shit in the file
-	if not lo or lo == "" or string.match(lo, "\\") or string.match(lo, '%(') or  string.match(lo, "%)") or string.match(lo, "%.") then return end
-	lo = load(lo)()	
-	local MyPed = myHandle()
-	Natives.InvokeVoid(0xF25DF915FA38C5F3, myHandle())
-	for w in pairs(lo) do
-		local whash = joaat(w)
-		if not Natives.InvokeBool(0x937C71165CF334B3, whash) then Logger.LogError("DEV_ERR: invalid weapon hash '"..whash.."'") goto continue end
-		giveWeapon(whash)
-		yield()
-		Natives.InvokeVoid(0x50969B9B89ED5738, MyPed, whash, lo[w].TintIndex)
-		if lo[w].Camo and lo[w].Camo ~= "" and lo[w].Camo ~= "-1" then
-			Natives.InvokeVoid(0xD966D51AA5B28BB9, MyPed, whash, joaat(lo[w].Camo))
-			if lo[w].CamoTint and lo[w].CamoTint ~= "" and lo[w].CamoTint ~= "-1" then -- only for mk2
-				Natives.InvokeVoid(0x9FE5633880ECD8ED, MyPed, whash, joaat(lo[w].Camo), tonumber(lo[w].CamoTint))
-			end
-		end
-		if lo[w].Components and type(lo[w].Components) == "table" then
-			for i=1,#lo[w].Components do
-				Natives.InvokeVoid(0xD966D51AA5B28BB9, MyPed, whash, joaat(lo[w].Components[i]))
-			end
-		end
-		::continue::
-	end	
-	Logger.LogInfo("loaded loudout")
-end
-function saveLoadOut()
-	local LoadoutPath = FileMgr.GetMenuRootPath() .. "\\Lua\\resources\\loadout.txt"
-	Logger.LogInfo("Saving loadout...")
-	FileMgr.WriteFileContent(LoadoutPath, "return {\n")
-	for myW in pairs(myWeapons) do
-		print("Saving " .. myW)
-		FileMgr.WriteFileContent(LoadoutPath, "\t[\""..myW.."\"] = {\n", true)
-
-		FileMgr.WriteFileContent(LoadoutPath, "\t\tTintIndex = " .. (allWeapons[myW].tintEquipped or "0") .. ",\n", true)
-
-		FileMgr.WriteFileContent(LoadoutPath, "\t\tCamo = \"" , true)
-		if allWeapons[myW].camoEquipped and allWeapons[myW].camoEquipped ~= -1 and allWeapons[myW].camoEquipped[1] then
-			FileMgr.WriteFileContent(LoadoutPath, (allWeapons[myW].camoEquipped[1] or "-1") .. "\",\n", true)
-			FileMgr.WriteFileContent(LoadoutPath, "\t\tCamoTint = " .. (allWeapons[myW].camoTintEquipped or "-1") .. ",\n", true)
-		else
-			FileMgr.WriteFileContent(LoadoutPath, "-1\",\n", true)
-			FileMgr.WriteFileContent(LoadoutPath, "\t\tCamoTint = -1,\n", true)
-		end		
-
-		FileMgr.WriteFileContent(LoadoutPath, "\t\tComponents = {\n", true)
-		if not allWeapons[myW].currentAttachments then goto next end -- these weapons cant take any components
-		if #allWeapons[myW].currentAttachments == 0 and dbg then Logger.LogError("No attachments for " .. myW) goto next end -- no equiped attachments
-		for i=1,#allWeapons[myW].currentAttachments do
-			FileMgr.WriteFileContent(LoadoutPath, "\t\t\t\"" .. allWeapons[myW].currentAttachments[i][1] .."\",\n", true)
-		end
-		::next::
-		FileMgr.WriteFileContent(LoadoutPath, "\t\t}\n", true)
-
-		FileMgr.WriteFileContent(LoadoutPath, "\t},\n", true)
-	end
-	FileMgr.WriteFileContent(LoadoutPath, "}", true)
-	Logger.LogInfo("done!")
-end
-function giveWeapon(WeaponName)	
-	if not WeaponName or WeaponName == 0x0 then return end
-	if type(WeaponName) == "string" then WeaponName = joaat(WeaponName) end
-	if not Natives.InvokeBool(0x937C71165CF334B3, WeaponName) then Logger.LogError("DEV_ERR1: invalid weapon hash '"..WeaponName.."'") return end
-	Natives.InvokeVoid(0xBF0FD6E56C964FCB, myHandle(), WeaponName, 69, true, false)
-end
-function removeWeapon(WeaponName)
-	if not WeaponName or WeaponName == 0x0 then return end
-	if type(WeaponName) == "string" then WeaponName = joaat(WeaponName) end
-	if not Natives.InvokeBool(0x937C71165CF334B3, WeaponName) then Logger.LogError("DEV_ERR2: invalid weapon hash '"..WeaponName.."'") return end
-	Natives.InvokeVoid(0x4899CB088EDF59B8, myHandle(), WeaponName)
-end
-function fillAmmoForWeapon(WeaponName)
-	if not WeaponName or WeaponName == 0x0 then return end
-	if type(WeaponName) == "string" then WeaponName = joaat(WeaponName) end
-	if not Natives.InvokeBool(0x937C71165CF334B3, WeaponName) then Logger.LogError("DEV_ERR3: invalid weapon hash '"..WeaponName.."'") return end
-	local MyPed = myHandle()
-	if Natives.InvokeBool(0x8DECB02F88F428BC, MyPed, WeaponName) then
-		Natives.InvokeVoid(0x14E56BC5B5DB6A19, MyPed, WeaponName, 9999)
-
-		local clipSize = Natives.InvokeInt(0xA38DCFFCEA8962FA, MyPed, WeaponName, true)
-		Natives.InvokeBool(0xDCD2A934D65CB497, MyPed, WeaponName, clipSize)		
-
-		local AmmoType = Natives.InvokeInt(0x7FEAD38B326B9F74, MyPed, WeaponName)
-		Natives.InvokeVoid(0x5FD1E1F011E76D7E, MyPed, AmmoType, 9999)
-	end
-end
-function forAllWeaponsDo(action)
-	if action == "removecomp" or action == "ammo" then
-		for i in pairs(myWeapons) do
-			if action == "removecomp" then
-				if allWeapons[i].possibleAttachments then
-					for j=1,#allWeapons[i].possibleAttachments do
-						Natives.InvokeVoid(0x1E8BE90C74FB4C09, myHandle(), joaat(i), joaat(allWeapons[i].possibleAttachments[j][1]))
-					end
-				end
-			else
-				fillAmmoForWeapon(i)
-			end
-		end
-		return
-	end
-	if action == "give" then
-		FeatureMgr.TriggerFeatureCallback(joaat("GiveAllWeapons"))
-	elseif action == "remove" then
-		FeatureMgr.TriggerFeatureCallback(joaat("RemoveAllWeapons"))
-	elseif action == "givecomp" then
-		FeatureMgr.TriggerFeatureCallback(joaat("GiveallWeaponComponents"))
-	else
-		Logger.LogError("DEV_ERR: invalid action '"..tostring(action).."'")
-	end
-end
-
-local WeaponFeatures = {
-	FeatureMgr.AddFeature(joaat("ComboWeaponCategory"), "###ComboWeaponCategory", eFeatureType.Combo, "", function() end, false):SetList(weaponCats):SetListIndex(0),	
-	FeatureMgr.AddFeature(joaat("GiveAllWeaponAttachment"), "Give Components", eFeatureType.Button, "Adds all possible attachments to all currently equiped Weapons",
-		function()
-			forAllWeaponsDo("givecomp")
-		end),
-
-	FeatureMgr.AddFeature(joaat("RemoveAllWeaponAttachment"), "Remove Components", eFeatureType.Button, "Removes every attachment from every Weapon",
-		function()
-			forAllWeaponsDo("removecomp")
-		end),
-
-	FeatureMgr.AddFeature(joaat("FillAmmo"), "Fill Ammo", eFeatureType.Button, "Fills ammo for all weapons you have equiped",
-		function()
-			forAllWeaponsDo("ammo")
-		end),
-
-	FeatureMgr.AddFeature(joaat("giveLoadOut"), "Load Loadout", eFeatureType.Button, "Loads the loadout from a file",
-		function()
-			giveLoadOut()
-		end),
-
-	FeatureMgr.AddFeature(joaat("saveLoadOut"), "Save Loadout", eFeatureType.Button, "Saves your current loadout to a file. Will overwrite the current saved laodout",
-		function()
-			saveLoadOut()
-		end, false),
-
-	FeatureMgr.AddFeature(joaat("FillAmmoOnWeaponChange"), "Max Ammo on Weapon Change", eFeatureType.Toggle, "Fills the ammo for the weapon you have in your hands when you switch them",
-		function(f)
-			if (f) then
-				fillAmmoForWeapon(Natives.InvokeInt(0x0A6DB4965674D243, myHandle()))
-			end
-		end):SetDefaultValue(true):Reset():RegisterCallbackTrigger(eCallbackTrigger.OnWeaponChange),
-
-	FeatureMgr.AddFeature(joaat("AutoLoadLoadout"), "Loadout", eFeatureType.Toggle, "Gives you your loadout on every new session", 
-		function(f)
-			if f:GetBoolValue() then
-				FeatureMgr.GetFeature(joaat("AutoGiveAllWeaopns")):SetValue(false)
-			end
-		end, false):SetDefaultValue(true):Reset(),
-
-	FeatureMgr.AddFeature(joaat("AutoGiveAllWeaopns"), "All Weapons", eFeatureType.Toggle, "Gives you all Weapon on every new session", 
-		function(f)
-			if f:GetBoolValue() then
-				FeatureMgr.GetFeature(joaat("AutoLoadLoadout")):SetValue(false)
-			end 
-		end, false),
-
-	FeatureMgr.AddFeature(joaat("giveWeaponPara"), "Give Parachute", eFeatureType.Button, "",
-		function() 
-			giveWeapon(joaat("GADGET_PARACHUTE"))
-		end),
-}
-
-function renderAttachmentOptions(cat)
-	for i=1,#allweaponCatsAndNames[cat] do
-		-- hashname not hash but idc
-		thisHash, thisName = allweaponCatsAndNames[cat][i][1], tostring(allweaponCatsAndNames[cat][i][2])
-		if ImGui.TreeNode(thisName) then
-			if not myWeapons[thisHash] then
-				ClickGUI.RenderFeature(joaat("give" .. thisHash))
-			else				
-				ClickGUI.RenderFeature(joaat("remove" .. thisHash))			
-				if allWeapons[thisHash].possibleAttachments and type(allWeapons[thisHash].possibleAttachments) == "table" then
-					if #allWeapons[thisHash].possibleAttachments == 1 then
-						ClickGUI.RenderFeature(joaat("addAttachment" .. thisHash))
-					elseif #allWeapons[thisHash].possibleAttachments >= 2 then
-						-- if ImGui.BeginCombo("##WeaponAttachments"..thisHash, tostring(allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted][2])) then
-						-- 	for j=1,#allWeapons[thisHash].possibleAttachments do
-						-- 		if allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted] then
-						-- 			isSelected = false
-						-- 			if allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted][2] == allWeapons[thisHash].possibleAttachments[j][2] then
-						-- 				isSelected = true
-						-- 			end
-						-- 			local showSep,showSepBefore = false,false
-						-- 			if string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "grip") then showSep = true end
-						-- 			if string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "flashlight") then showSep = true end
-						-- 			if string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "default") then showSepBefore = true end
-						-- 			if showSep or showSepBefore then ImGui.Separator() end
-						-- 			if ImGui.Selectable(allWeapons[thisHash].possibleAttachments[j][2], isSelected) then
-						-- 				allWeapons[thisHash].attachmentSelcted = j
-						-- 				if isSelected then
-						-- 					ImGui.SetItemDefaultFocus()
-						-- 				end
-						-- 			end
-						-- 			-- > 7 bc some dont have a grip etc so it would show 2 separators -> works, would need to check all weapons now but im lazy :Troll
-						-- 			if #allWeapons[thisHash].possibleAttachments > 7 and showSep or (string.match(allWeapons[thisHash].possibleAttachments[j][2]:lower(), "explo") and j ~= #allWeapons[thisHash].possibleAttachments) then
-						-- 				ImGui.Separator()
-						-- 			end
-						-- 		else
-						-- 			Logger.LogError(tostring(allWeapons[thisHash].possibleAttachments[allWeapons[thisHash].attachmentSelcted]))
-						-- 		end								
-						-- 	end	
-						-- 	ImGui.EndCombo()
-						-- end
-						ImGui.Separator()
-						ClickGUI.RenderFeature(joaat("attachmentsCombo" .. thisHash))
-						-- ImGui.SameLine()
-						ClickGUI.RenderFeature(joaat("removeAttachment" .. thisHash))
-						ClickGUI.RenderFeature(joaat("addAttachment" .. thisHash))
-						ImGui.Separator()
-					end
-					::attachmenttGui::					
-				end
-				if allWeapons[thisHash].tintType ~= "none" then
-					ClickGUI.RenderFeature(joaat("tintCombo" .. thisHash))
-					ImGui.SameLine()
-					ClickGUI.RenderFeature(joaat("setTint" .. thisHash))
-				end
-				if allWeapons[thisHash].possibleCamos then						
-					if #allWeapons[thisHash].possibleCamos ~= 1 then
-						ClickGUI.RenderFeature(joaat("camoCombo" .. thisHash))
-						ImGui.SameLine()
-					end
-					ClickGUI.RenderFeature(joaat("removeCamo" .. thisHash))
-					ClickGUI.RenderFeature(joaat("addCamo" .. thisHash))
-					if allWeapons[thisHash].tintType == "tintsMK2s" and allWeapons[thisHash].camoEquipped ~= -1 then
-						ClickGUI.RenderFeature(joaat("mk2TintsCombo" .. thisHash))
-						ImGui.SameLine()
-						ClickGUI.RenderFeature(joaat("mk2TintsSet" .. thisHash))
-					end
-				end
-			end
-			ImGui.TreePop()
-		end
-	end
-end
-
-function clickGUI()
-	if ImGui.BeginTabBar("WM##TabBar") then		
-		if ImGui.BeginTabItem("Weapon Manager") then
-			if ImGui.BeginTable("WeaponManager1", 2, ImGuiTableFlags.Resizable) then
-				ImGui.TableNextRow()
-				for column = 0,1 do
-					ImGui.TableSetColumnIndex(column)
-					if column == 0 then
-						ClickGUI.RenderFeature(joaat("ComboWeaponCategory"))
-						local CurrCatVal = weaponCats[WeaponFeatures[1]:GetListIndex()+1]
-						if CurrCatVal == "Assault Rifles" then
-							renderAttachmentOptions('assault_rifles')
-						elseif CurrCatVal == "Sniper Rifles" then
-							renderAttachmentOptions('sniper_rifles')
-						elseif CurrCatVal == "Meele Weapons" then
-							renderAttachmentOptions('melees')
-						elseif CurrCatVal == "Shotguns" then
-							renderAttachmentOptions('shotguns')
-						elseif CurrCatVal == "Heavy Weapons" then
-							renderAttachmentOptions('heavys')
-						elseif CurrCatVal == "Grenades" then
-							renderAttachmentOptions('nades')
-						elseif CurrCatVal == "Pistols" then
-							renderAttachmentOptions('pistols')
-						elseif CurrCatVal == "S/LMGs" then
-							renderAttachmentOptions('s_l_mgs')
-						else
-							Logger.LogError("Invalid TAB:".. CurrCatVal)
-						end
-					else
-						if ClickGUI.BeginCustomChildWindow("All Weapons") then
-							ClickGUI.RenderFeature(joaat("GiveAllWeapons"))
-							ImGui.SameLine()
-							ClickGUI.RenderFeature(joaat("RemoveAllWeapons"))
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("GiveAllWeaponAttachment"))
-							ImGui.SameLine()
-							ClickGUI.RenderFeature(joaat("RemoveAllWeaponAttachment"))
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("FillAmmo"))				
-							ClickGUI.EndCustomChildWindow()
-						end
-						if ClickGUI.BeginCustomChildWindow("Loadout") then
-							ClickGUI.RenderFeature(joaat("giveLoadOut"))
-							ImGui.SameLine()						
-							ClickGUI.RenderFeature(joaat("saveLoadOut"))
-							ImGui.Separator()
-							ImGui.Text("Auto give on New Session:")
-							ClickGUI.RenderFeature(joaat("AutoLoadLoadout"))
-							ImGui.SameLine()
-							ClickGUI.RenderFeature(joaat("AutoGiveAllWeaopns"))
-							ClickGUI.EndCustomChildWindow()
-						end
-						if ClickGUI.BeginCustomChildWindow("Weapon values") then
-							ClickGUI.RenderFeature(950937895)
-							ClickGUI.RenderFeature(1266914962)
-							ClickGUI.RenderFeature(378227101)
-							ClickGUI.RenderFeature(851365501)
-							ClickGUI.RenderFeature(2593851087)
-							ClickGUI.RenderFeature(4252099700)
-							ClickGUI.RenderFeature(3846859030)
-							ClickGUI.RenderFeature(2885146915)
-							ClickGUI.EndCustomChildWindow()
-						end
-					end
-				end
-				ImGui.EndTable()
-			end
-			ImGui.EndTabItem()
-		end
-		if ImGui.BeginTabItem("Cherax Aimbot") then
-			if ImGui.BeginTable("WeaponManager2", 2, ImGuiTableFlags.Resizable) then
-				ImGui.TableNextRow()
-				for column = 0,1 do
-					ImGui.TableSetColumnIndex(column)
-					if column == 0 then
-						if ClickGUI.BeginCustomChildWindow("Aimbot") then
-							ClickGUI.RenderFeature(joaat("AimbotEnabled"))							
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("AimbotKey"))
-							ClickGUI.RenderFeature(joaat("AimbotTargetMode"))
-							ClickGUI.RenderFeature(joaat("AimbotTargetBone"))
-							ImGui.Separator()
-							ClickGUI.RenderFeature(2142674441) -- Bulletprediciton
-							ClickGUI.RenderFeature(415855969) -- frame predicion
-							ClickGUI.RenderFeature(joaat("AimbotVisibleCheck"))
-							ClickGUI.RenderFeature(joaat("AimbotShowLockedOn"))							
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("AimbotShootDead"))
-							ClickGUI.RenderFeature(joaat("AimbotShootNPCs"))
-							ClickGUI.RenderFeature(joaat("AimbotShootCops"))
-							ClickGUI.RenderFeature(joaat("AimbotShootPlayers"))
-							ClickGUI.RenderFeature(joaat("AimbotFriendlyFire"))							
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("AimbotCircleColor"))
-							ClickGUI.EndCustomChildWindow()
-						end
-					else
-						if ClickGUI.BeginCustomChildWindow("Settings") then
-							ClickGUI.RenderFeature(joaat("AimbotAutoDistance"))
-							ClickGUI.RenderFeature(joaat("AimbotDistance"))
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("AimbotDrawFOV"))
-							ClickGUI.RenderFeature(joaat("AimbotFOV"))
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("AimbotTargetSwitchDelay"))
-							ClickGUI.RenderFeature(joaat("AimbotSmoothAim"))
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("AimbotDeadZone"))
-							ClickGUI.RenderFeature(joaat("AimbotShowDeadZone"))							
-							ClickGUI.RenderFeature(joaat("AimbotDeadZoneRadius"))
-							ImGui.Separator()							
-							ClickGUI.RenderFeature(joaat("AimbotSilentBullets"))
-							ClickGUI.RenderFeature(joaat("AimbotSilentMagicBullets"))
-							ClickGUI.RenderFeature(joaat("AimbotDrawSilentFOV"))
-							ClickGUI.RenderFeature(joaat("AimbotSilentFOV"))
-							ClickGUI.EndCustomChildWindow()
-						end
-					end
-				end
-				ImGui.EndTable()
-			end
-			ImGui.EndTabItem()
-		end
-		if ImGui.BeginTabItem("Others") then
-			if ImGui.BeginTable("WeaponManager3", 2, ImGuiTableFlags.Resizable) then
-				ImGui.TableNextRow()
-				for column = 0,1 do
-					ImGui.TableSetColumnIndex(column)
-					if column == 0 then							
-						if ClickGUI.BeginCustomChildWindow("Misc") then							
-							ClickGUI.RenderFeature(joaat("CustomImpactType"))
-							ClickGUI.RenderFeature(joaat("CustomImpact"))
-							ImGui.Separator()
-							ClickGUI.RenderFeature(joaat("giveWeaponPara"))
-							ClickGUI.RenderFeature(joaat("RapidFire"))
-							ClickGUI.RenderFeature(445878866) -- unlimited range
-							ClickGUI.RenderFeature(joaat("InstantLockOn"))
-							ClickGUI.RenderFeature(joaat("BypassC4Limit"))
-							ClickGUI.RenderFeature(joaat("AllowAllWeaponsDriveBy"))
-							ClickGUI.RenderFeature(joaat("FillAmmoOnWeaponChange"))							
-							ClickGUI.RenderFeature(joaat("InvisibleWeapon"))							
-							ClickGUI.EndCustomChildWindow() 
-						end	
-					else
-						if ClickGUI.BeginCustomChildWindow("Fun Guns") then	
-							ClickGUI.RenderFeature(joaat("TeleportGun"))
-							ClickGUI.RenderFeature(joaat("GrappleGun"))
-							ClickGUI.RenderFeature(joaat("AirstrikeGun"))
-							ClickGUI.RenderFeature(joaat("ReviveGun"))
-							ClickGUI.RenderFeature(joaat("ShrinkGun"))
-							ClickGUI.RenderFeature(joaat("DriveGun"))
-							ClickGUI.RenderFeature(joaat("SoulSwitchGun"))
-							ClickGUI.RenderFeature(joaat("GravityGun"))
-							ClickGUI.RenderFeature(joaat("DeleteGun"))
-							ClickGUI.RenderFeature(joaat("PedGun"))
-							ClickGUI.RenderFeature(joaat("BlockGun"))
-							ClickGUI.EndCustomChildWindow() 
-						end																				
-					end
-				end
-				ImGui.EndTable()
-			end
-			ImGui.EndTabItem()
-		end
-		ImGui.EndTabBar()
-	end
-end
-function addListUIFeatures(cat, tab)
-	for i=1,#allweaponCatsAndNames[cat] do
-		local thisHash, thisName = allweaponCatsAndNames[cat][i][1], tostring(allweaponCatsAndNames[cat][i][2])
-		local subTab = tab:AddSubTab(thisName)
-		FeatureMgr.AddFeature(joaat("give" .. thisHash), "Give " .. thisName, eFeatureType.Button, "Will add " .. thisName .. " to your equiped Weapons", function(f) giveWeapon(thisHash) end)
-		FeatureMgr.AddFeature(joaat("remove" .. thisHash), "Remove " .. thisName, eFeatureType.Button, "Will remove " .. thisName .. " from your equiped Weapons", function(f) removeWeapon(thisHash) end)
-		subTab:AddFeature(joaat("give" .. thisHash))
-		subTab:AddFeature(joaat("remove" .. thisHash))		
-		if allWeapons[thisHash].possibleAttachments and type(allWeapons[thisHash].possibleAttachments) == "table" then
-			subTab:AddSeperator()
-			FeatureMgr.AddFeature(joaat("attachmentsCombo" .. thisHash), "Selected Attachment", eFeatureType.Combo, "Current Selected attachment that gets added/removed"):SetList(allWeapons[thisHash].possibleAttachmentNames)
-			FeatureMgr.AddFeature(joaat("addAttachment" .. thisHash), "Add Attachment", eFeatureType.Button, "Adds the selected Camo", function()
-				local index = FeatureMgr.GetFeature(joaat("attachmentsCombo" .. thisHash)):GetListIndex()+1
-				Natives.InvokeVoid(0xD966D51AA5B28BB9, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].possibleAttachments[index][1]) )-- [1][1] -> index 1, hash
-			end)
-			FeatureMgr.AddFeature(joaat("removeAttachment" .. thisHash), "Remove Attachment", eFeatureType.Button, "Adds the selected Camo", function()
-				local index = FeatureMgr.GetFeature(joaat("attachmentsCombo" .. thisHash)):GetListIndex()+1
-				Natives.InvokeVoid(0x1E8BE90C74FB4C09, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].possibleAttachments[index][1]) )-- [1][1] -> index 1, hash
-			end)
-			subTab:AddFeature(joaat("attachmentsCombo" .. thisHash))
-			subTab:AddFeature(joaat("addAttachment" .. thisHash))
-			subTab:AddFeature(joaat("removeAttachment" .. thisHash))
-			FeatureMgr.GetFeature(joaat("addAttachment" .. thisHash)).Name = "Add###addAttachment" .. thisHash
-			FeatureMgr.GetFeature(joaat("removeAttachment" .. thisHash)).Name = "Remove###removeAttachment" .. thisHash
-		end
-		if allWeapons[thisHash].tintType ~= "none" then			
-			subTab:AddSeperator()
-			FeatureMgr.AddFeature(joaat("tintCombo" .. thisHash), "Selected Tint", eFeatureType.Combo, "The tint that will be set"):SetList(_G[allWeapons[thisHash].tintType])
-			FeatureMgr.AddFeature(joaat("setTint" .. thisHash), "Set", eFeatureType.Button, "Sets the selected Tint", function(f)
-				local index = FeatureMgr.GetFeature(joaat("tintCombo" .. thisHash)):GetListIndex()
-				Natives.InvokeVoid(0x50969B9B89ED5738, myHandle(), joaat(thisHash), index)
-			end)
-			subTab:AddFeature(joaat("tintCombo" .. thisHash))
-			subTab:AddFeature(joaat("setTint" .. thisHash))
-			FeatureMgr.GetFeature(joaat("tintCombo" .. thisHash)).Name = "###SelectedTint" -- can rename as it wont update after its added (only in clickui)
-		end
-		if allWeapons[thisHash].possibleCamoNames then
-			subTab:AddSeperator()
-			FeatureMgr.AddFeature(joaat("camoCombo" .. thisHash), "Selected Camo", eFeatureType.Combo, "Camo that will be added/removed", function(f)
-				allWeapons[thisHash].camoSelcted = f:GetListIndex()+1
-			end):SetList(allWeapons[thisHash].possibleCamoNames)
-			FeatureMgr.AddFeature(joaat("addCamo" .. thisHash), "Add Camo", eFeatureType.Button, "Adds the selected Camo", function()
-				local index = FeatureMgr.GetFeature(joaat("camoCombo" .. thisHash)):GetListIndex()+1
-				Natives.InvokeVoid(0xD966D51AA5B28BB9, myHandle(), joaat(thisHash),joaat(allWeapons[thisHash].possibleCamos[index][1]))
-			end)
-			FeatureMgr.AddFeature(joaat("removeCamo" .. thisHash), "Remove Camo", eFeatureType.Button, "Adds the selected Camo", function()
-				local index = FeatureMgr.GetFeature(joaat("camoCombo" .. thisHash)):GetListIndex()+1
-				Natives.InvokeVoid(0x1E8BE90C74FB4C09, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].possibleCamos[index][1]))
-			end)
-			if #allWeapons[thisHash].possibleCamos == 1 then
-				-- if only 1 then i dont need the combo				
-				-- so i can also change the add / remove buttons for clickui as it wont change in listui
-				-- very real
-				FeatureMgr.GetFeature(joaat("addCamo" .. thisHash)).Name = "Add " .. allWeapons[thisHash].possibleCamoNames[1]
-				FeatureMgr.GetFeature(joaat("removeCamo" .. thisHash)).Name = "Remove " .. allWeapons[thisHash].possibleCamoNames[1]
-			else
-				subTab:AddFeature(joaat("camoCombo" .. thisHash))
-				FeatureMgr.GetFeature(joaat("camoCombo" .. thisHash)).Name = "###camoCombo" .. thisHash
-			end
-			subTab:AddFeature(joaat("addCamo" .. thisHash))
-			subTab:AddFeature(joaat("removeCamo" .. thisHash))
-		end
-		if allWeapons[thisHash].tintType == "tintsMK2s" and allWeapons[thisHash].camoEquipped ~= -1 then
-			subTab:AddSeperator()
-			FeatureMgr.AddFeature(joaat("mk2TintsCombo" .. thisHash), "Selected Camo tint", eFeatureType.Combo, "Selected Camo tint type for MK2 camos"):SetList(liveryColorsMK2)
-			FeatureMgr.AddFeature(joaat("mk2TintsSet" .. thisHash), "set", eFeatureType.Button, "Sets the selected Camo tint type for MK2 camos", function()
-				local index = FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. thisHash)):GetListIndex()
-				Natives.InvokeVoid(0x9FE5633880ECD8ED, myHandle(), joaat(thisHash), joaat(allWeapons[thisHash].camoEquipped[1]), index)
-			end)
-			subTab:AddFeature(joaat("mk2TintsCombo" .. thisHash))
-			subTab:AddFeature(joaat("mk2TintsSet" .. thisHash))
-			FeatureMgr.GetFeature(joaat("mk2TintsCombo" .. thisHash)).Name = "###mk2CamoCombo" .. thisHash
-		end
-	end
-end
-
-qJob(function()		
-	for c in pairs(allweaponCatsAndNames) do
-		for i=1,#allweaponCatsAndNames[c] do
-			-- allweaponCatsAndNames[c] = s_l_mgs, pistols, ...
-			-- allweaponCatsAndNames[c][i] = {"weapon_sniperrifle", "Sniper Rifle"}, {"weapon_compactlauncher", "Compact Grenade Launcher"}, ...
-			wn = allweaponCatsAndNames[c][i][1] -- dont want to copy pasta over and over again :Trol:
-			local CurrWeapHash = joaat(allweaponCatsAndNames[c][i][1]) -- same for hash
-			allWeapons[wn] = {} -- create table for every weapon
-			if #allWeapons > 0 then Logger.Log(eLogColor.CYAN, "SUCCES", "Niceballs") end
-			allWeapons[wn].tintType = Natives.InvokeInt(0x5DCF6C5CAB2E9BF7, CurrWeapHash)
-			if allWeapons[wn].tintType == 1 then
-				allWeapons[wn].tintType = "none" -- weapon_doubleaction says 1 for some reason but has none :kekw
-			elseif allWeapons[wn].tintType == 7 then
-				allWeapons[wn].tintType = "tintsRays"
-			elseif allWeapons[wn].tintType == 8 then
-				allWeapons[wn].tintType = "tintsNormal"
-			elseif allWeapons[wn].tintType == 33 then
-				allWeapons[wn].tintType = "tintsMK2s"
-				allWeapons[wn].camoTintSelected = 1 -- tint for MK2 camo (imgui)
-				allWeapons[wn].camoTintEquipped = -1 -- only used for saving if its an mk2 weapon
-			else
-				Logger.LogError("[IWT] Unknown Weapon Tints " .. allweaponCatsAndNames[c][i][1] .. " | " .. allWeapons[wn].tintType)
-				allWeapons[wn].tintType = "unk"
-			end
-			allWeapons[wn].tintSelected = 1 -- normal tint (imgui)
-			allWeapons[wn].tintEquipped = 1 
-			allWeapons[wn].camoSelcted = 1 -- normal camo (imgui)
-			allWeapons[wn].attachmentSelcted = 1 -- attachment index (imgui)
-			----------------------------------------------------------------------------------------------------------
-			for j=1,#allWeaponComponents do			
-				if Natives.InvokeBool(0x5CEE3DF569CECAB0, CurrWeapHash, joaat(allWeaponComponents[j][1])) then
-					if string.match(allWeaponComponents[j][1], "CAMO") or string.match(allWeaponComponents[j][1], "VARMOD") then
-						if not allWeapons[wn].possibleCamos then 
-							allWeapons[wn].possibleCamos = {} 
-							allWeapons[wn].possibleCamoNames = {} 
-							allWeapons[wn].camoEquipped = {} -- current equipped camo {hashname, name}
-						end -- create table if it doesnt exist
-						table.insert(allWeapons[wn].possibleCamos, allWeaponComponents[j])
-						table.insert(allWeapons[wn].possibleCamoNames, allWeaponComponents[j][2]) -- needed for combo feat smh
-					else
-						if not allWeapons[wn].possibleAttachments then
-							allWeapons[wn].possibleAttachments = {}
-							allWeapons[wn].possibleAttachmentNames = {}
-							allWeapons[wn].currentAttachments = {}
-						end
-						table.insert(allWeapons[wn].possibleAttachments, allWeaponComponents[j])
-						table.insert(allWeapons[wn].possibleAttachmentNames, allWeaponComponents[j][2])
-					end
-				end
-			end
-		end
-	end
-	-- call that shi once at the start
-	if FeatureMgr.IsFeatureEnabled(joaat("AutoLoadLoadout")) then
-		giveLoadOut()
-	end
-	if FeatureMgr.IsFeatureEnabled(joaat("AutoGiveAllWeaopns")) then
-		forAllWeaponsDo("give")
-	end
-	------------------------------
-	-- list ui
-	local rootTab = ListGUI.GetRootTab()
-	if rootTab then
-		local maintab = rootTab:AddSubTab("Better Weapons", "Weapon Manager and Cherax's Weapon features")
-		if maintab then
-			local managerTab = maintab:AddSubTab("Weapon Manager", "Weapon Manager")
-			if managerTab then
-				local assaultTab = managerTab:AddSubTab("Assault Rifles")
-				if assaultTab then
-					addListUIFeatures("assault_rifles", assaultTab)
-				end
-				local sniperTab = managerTab:AddSubTab("Sniper Rifles")
-				if sniperTab then
-					addListUIFeatures("sniper_rifles", sniperTab)
-				end
-				local meeleTab = managerTab:AddSubTab("Meele Weapons")
-				if meeleTab then
-					addListUIFeatures("melees", meeleTab)
-				end
-				local shotgunTab = managerTab:AddSubTab("Shotguns")
-				if shotgunTab then
-					addListUIFeatures("shotguns", shotgunTab)
-				end
-				local heavyTab = managerTab:AddSubTab("Heavy Weapons")
-				if heavyTab then
-					addListUIFeatures("heavys", heavyTab)
-				end
-				local grenadesTab = managerTab:AddSubTab("Grenades")
-				if grenadesTab then
-					addListUIFeatures("nades", grenadesTab)
-				end
-				local pistolTab = managerTab:AddSubTab("Pistols")
-				if pistolTab then
-					addListUIFeatures("pistols", pistolTab)
-				end
-				local smgTab = managerTab:AddSubTab("S/LMGs")
-				if smgTab then
-					addListUIFeatures("s_l_mgs", smgTab)
-				end	
-				local aimbotTab = maintab:AddSubTab("Aimbot", "Cherax's Aimbot features")
-				if aimbotTab then
-					aimbotTab:AddFeature(joaat("AimbotEnabled"))							
-					aimbotTab:AddSeperator()
-					aimbotTab:AddFeature(joaat("AimbotKey"))
-					aimbotTab:AddFeature(joaat("AimbotTargetMode"))
-					aimbotTab:AddFeature(joaat("AimbotTargetBone"))
-					aimbotTab:AddSeperator()
-					aimbotTab:AddFeature(2142674441) -- Bulletprediciton
-					aimbotTab:AddFeature(415855969) -- frame predicion
-					aimbotTab:AddFeature(joaat("AimbotVisibleCheck"))
-					aimbotTab:AddFeature(joaat("AimbotShowLockedOn"))							
-					aimbotTab:AddSeperator()
-					aimbotTab:AddFeature(joaat("AimbotShootDead"))
-					aimbotTab:AddFeature(joaat("AimbotShootNPCs"))
-					aimbotTab:AddFeature(joaat("AimbotShootCops"))
-					aimbotTab:AddFeature(joaat("AimbotShootPlayers"))
-					aimbotTab:AddFeature(joaat("AimbotFriendlyFire"))
-					aimbotTab:AddFeature(joaat("AimbotAutoDistance"))
-					aimbotTab:AddFeature(joaat("AimbotDistance"))
-					aimbotTab:AddSeperator()
-					aimbotTab:AddFeature(joaat("AimbotDrawFOV"))
-					aimbotTab:AddFeature(joaat("AimbotFOV"))
-					aimbotTab:AddFeature(joaat("AimbotCircleColor"))
-					aimbotTab:AddSeperator()
-					aimbotTab:AddFeature(joaat("AimbotTargetSwitchDelay"))
-					aimbotTab:AddFeature(joaat("AimbotSmoothAim"))
-					aimbotTab:AddSeperator()
-					aimbotTab:AddFeature(joaat("AimbotDeadZone"))
-					aimbotTab:AddFeature(joaat("AimbotShowDeadZone"))							
-					aimbotTab:AddFeature(joaat("AimbotDeadZoneRadius"))
-					aimbotTab:AddSeperator()							
-					aimbotTab:AddFeature(joaat("AimbotSilentBullets"))
-					aimbotTab:AddFeature(joaat("AimbotSilentMagicBullets"))
-					aimbotTab:AddFeature(joaat("AimbotDrawSilentFOV"))
-					aimbotTab:AddFeature(joaat("AimbotSilentFOV"))
-				end
-				local miscTab = maintab:AddSubTab("Misc", "All the other features")
-				if miscTab then
-					miscTab:AddFeature(joaat("CustomImpactType"))
-					miscTab:AddFeature(joaat("CustomImpact"))
-					miscTab:AddFeature(joaat("giveWeaponPara"))
-					miscTab:AddFeature(joaat("RapidFire"))
-					miscTab:AddFeature(445878866) -- unlimited range
-					miscTab:AddFeature(joaat("InstantLockOn"))
-					miscTab:AddFeature(joaat("BypassC4Limit"))
-					miscTab:AddFeature(joaat("AllowAllWeaponsDriveBy"))
-					miscTab:AddFeature(joaat("FillAmmoOnWeaponChange"))							
-					miscTab:AddFeature(joaat("InvisibleWeapon"))							
-					miscTab:AddFeature(joaat("TeleportGun"))
-					miscTab:AddFeature(joaat("GrappleGun"))
-					miscTab:AddFeature(joaat("AirstrikeGun"))
-					miscTab:AddFeature(joaat("ReviveGun"))
-					miscTab:AddFeature(joaat("ShrinkGun"))
-					miscTab:AddFeature(joaat("DriveGun"))
-					miscTab:AddFeature(joaat("SoulSwitchGun"))
-					miscTab:AddFeature(joaat("GravityGun"))
-					miscTab:AddFeature(joaat("DeleteGun"))
-					miscTab:AddFeature(joaat("PedGun"))
-					miscTab:AddFeature(joaat("BlockGun"))
-					miscTab:AddFeature(950937895)
-					miscTab:AddFeature(1266914962)
-					miscTab:AddFeature(378227101)
-					miscTab:AddFeature(851365501)
-					miscTab:AddFeature(2593851087)
-					miscTab:AddFeature(4252099700)
-					miscTab:AddFeature(3846859030)
-					miscTab:AddFeature(2885146915)
-				end
-			end
-		end
-	end
-	Script.RegisterLooped(function()
-		GetWeaponStuff()
-		yield(420)
-	end)
-end)
-EventMgr.RegisterHandler(eLuaEvent.ON_SESSION_CHANGE, function()
-	qJob(function()
-		if not Natives.InvokeBool(0x9DE624D2FC4B603F) then -- dont wait for valid ped if loaded in story mode
-	 		goto doshitsmh
-		end
-		while not ShouldUnload() do
-			yield(10)
-			local v = GTA.GetLocalPed():GetVelocity()
-			if v.x ~= 0.0 and v.y ~= 0.0 and v.z ~= 0.0 then			
-				break
-			end
-			-- the following works too, but the remove all weapons for the loadout wont work correctly
-			--if GTA.GetLocalPed() and GTA.GetLocalPed() ~= 0 then
-			--	break
-			--end
-		end
-		::doshitsmh::
-		if FeatureMgr.IsFeatureEnabled(joaat("AutoLoadLoadout")) then
-			giveLoadOut()
-		end
-		if FeatureMgr.IsFeatureEnabled(joaat("AutoGiveAllWeaopns")) then
-			forAllWeaponsDo("give")
-		end
-		Logger.LogInfo("Joined a New Session")
-	end)
-end)
-
---------------------------------------------
-ClickGUI.AddTab("Better Weapons", clickGUI)
+POOL -
+int GET_MAX_PEDS()
+int GET_MAX_VEHICLES()
+int GET_MAX_OBJECTS()
+int GET_PED_COUNT()
+int GET_VEHICLE_COUNT()
+int GET_OBJECT_COUNT()
+Ped GET_PED_AT_INDEX(int index)
+Vehicle GET_VEHICLE_AT_INDEX(int index)
+Object GET_OBJECT_AT_INDEX(int index)
+
+PLAYER-
+Ped GET_PLAYER_PED(Player player)
+Ped GET_PLAYER_PED_SCRIPT_INDEX(Player player)
+Ped PLAYER_PED_ID()
+Player PLAYER_ID()
+void SET_PLAYER_WANTED_LEVEL(Player player, int wantedLevel, bool disableNoMission)
+void SET_PLAYER_WANTED_LEVEL_NOW(Player player, bool p1)
+void SET_PLAYER_MODEL(Player player, Hash model)
+int GET_PLAYER_GROUP(Player player)
+bool IS_PLAYER_PLAYING(Player player)
+bool IS_PLAYER_FREE_AIMING(Player player)
+string GET_PLAYER_NAME(Player player)
+bool IS_PLAYER_PRESSING_HORN(Player player)
+int GET_PLAYER_WANTED_LEVEL(Player player)
+bool GET_PLAYER_INVINCIBLE(Player player)
+void SET_PLAYER_VISIBLE_LOCALLY(Player player, bool toggle)
+void SET_LOCAL_PLAYER_VISIBLE_LOCALLY(bool p0)
+int PLAYER_COUNT()
+bool IS_PLAYER_FEMALE(Player player)
+bool IS_PLAYER_FRIEND(Player player)
+Entity GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(Player player)
+int GET_PLAYER_SCID(Player player)
+int GET_PLAYER_IP(Player player)
+bool IS_PLAYER_IN_ANY_VEHICLE(Player player)
+vec3 GET_PLAYER_COORDS(Player player)
+float GET_PLAYER_HEADING(Player player)
+float GET_PLAYER_HEALTH(Player player)
+float GET_PLAYER_MAX_HEALTH(Player player)
+float GET_PLAYER_ARMOR(Player player)
+int GET_PLAYER_FROM_PED(Ped ped)
+int GET_PLAYER_TEAM(Player player)
+Vehicle GET_PLAYER_VEHICLE(Player player)
+bool IS_PLAYER_HOST(Player player)
+Player GET_HOST()
+bool IS_PLAYER_SCRIPT_HOST(Player player)
+Player GET_SCRIPT_HOST()
+Hash GET_PLAYER_MODEL(Player player)
+bool IS_PLAYER_VALID(Player player)
+int GET_PLAYER_HOST_TOKEN(Player player)
+int GET_PLAYER_HOST_PRIORITY(Player player)
+void SET_PLAYER_TARGETING_MODE(int mode)
+void SPECIAL_ABILITY_FILL_METER(Player player, bool p1)
+string IS_PLAYER_MODDER(Player player)
+bool DID_PLAYER_TRIGGER_RAC(Player player, int flag)
+
+SYSTEM -
+void WAIT(int ms)
+void WAIT()
+void YIELD(int ms)
+void YIELD()
+
+CAM -
+vec3 GET_GAMEPLAY_CAM_COORD()
+vec3 GET_GAMEPLAY_CAM_ROT(int rotationOrder)
+float GET_GAMEPLAY_CAM_RELATIVE_HEADING()
+float GET_GAMEPLAY_CAM_RELATIVE_PITCH()
+Cam CREATE_CAM(string camName, bool p1)
+bool DOES_CAM_EXIST(Cam cam)
+void SET_CAM_ACTIVE(Cam cam, bool active)
+bool IS_CAM_ACTIVE(Cam cam)
+void SET_CAM_FOV(Cam cam, float fieldOfView)
+void SET_CAM_ROT(Cam cam, float rotX, float rotY, float rotZ, int rotationOrder)
+void SET_CAM_COORD(Cam cam, float posX, float posY, float posZ)
+void RENDER_SCRIPT_CAMS(bool render, bool ease, int easeTime, bool p3, bool p4, Any p5)
+void DESTROY_CAM(Cam cam, bool netMissionEntity)
+void SHAKE_CAM(Cam cam, string type, float amplitude)
+vec3 GET_FINAL_RENDERED_CAM_ROT(int rotationOrder)
+vec3 GET_FINAL_RENDERED_CAM_COORD()
+void SET_CAM_PARAMS(Cam cam, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float fieldOfView, Any p8, int p9, int p10, int p11)
+void STOP_CAM_SHAKING(Cam cam, bool p1)
+void ATTACH_CAM_TO_ENTITY(Cam cam, Entity entity, float xOffset, float yOffset, float zOffset, bool isRelative)
+
+DECORATOR -
+bool DECOR_SET_TIME(Entity entity, string propertyName, int timestamp)
+bool DECOR_SET_BOOL(Entity entity, string propertyName, bool value)
+bool DECOR_SET_FLOAT(Entity entity, string propertyName, float value)
+bool DECOR_SET_INT(Entity entity, string propertyName, int value)
+bool DECOR_GET_BOOL(Entity entity, string propertyName)
+float DECOR_GET_FLOAT(Entity entity, string propertyName)
+int DECOR_GET_INT(Entity entity, string propertyName)
+bool DECOR_EXIST_ON(Entity entity, string propertyName)
+bool DECOR_REMOVE(Entity entity, string propertyName)
+void DECOR_REGISTER(string propertyName, int type)
+
+WORLDPROBE -
+int START_SHAPE_TEST(float fromX, float fromY, float fromZ, float toX, float toY, float toZ, Entity ignore)
+Entity GET_HIT_ENTITY(int handle)
+vec3 GET_HIT_COORDS(int handle)
+bool DID_HIT_ANYTHING(int handle)
+
+STATS -
+bool STAT_SET_INT(Hash statName, int value, bool save)
+bool STAT_SET_FLOAT(Hash statName, float value, bool save)
+bool STAT_SET_BOOL(Hash statName, bool value, bool save)
+int STAT_GET_INT(Hash stat)
+float STAT_GET_FLOAT(Hash stat)
+bool STAT_GET_BOOL(Hash stat)
+Hash GET_NGSTAT_BOOL_HASH(int index, bool spStat, bool charStat, int character, string section)
+Hash GET_NGSTAT_INT_HASH(int index, bool spStat, bool charStat, int character, string section)
+int STAT_GET_PACKED_BOOL_MASK(int p0)
+int STAT_GET_PACKED_INT_MASK(int p0)
+bool STAT_SET_BOOL_MASKED(Hash statName, bool value, int mask, bool save)
+bool STAT_SET_INT_MASKED(Hash statName, Any p1, Any p2, int p3, bool save)
+bool STAT_SAVE(int p0, bool p1, int p2)
+
+CLOCK -
+void SET_CLOCK_TIME(int hour, int minute, int second)
+void PAUSE_CLOCK(bool toggle)
+int GET_CLOCK_HOURS()
+int GET_CLOCK_MINUTES()
+int GET_CLOCK_SECONDS()
+
+FIRE -
+FireId START_ENTITY_FIRE(Entity entity)
+void STOP_ENTITY_FIRE(Entity entity)
+bool IS_ENTITY_ON_FIRE(Entity entity)
+void ADD_EXPLOSION(float x, float y, float z, int explosionType, float damageScale, bool isAudible, bool isInvisible, float cameraShake, bool noDamage)
+void ADD_OWNED_EXPLOSION(Ped owner, float x, float y, float z, int explosionType, float damageScale, bool isAudible, bool isInvisible, float cameraShake)
+
+STREAMING -
+int GET_MODEL_INFO(Hash model)
+void REQUEST_MODEL(Hash model)
+bool HAS_MODEL_LOADED(Hash model)
+void SET_MODEL_AS_NO_LONGER_NEEDED(Hash model)
+bool IS_MODEL_IN_CDIMAGE(Hash model)
+bool IS_MODEL_VALID(Hash model)
+bool IS_MODEL_A_PED(Hash model)
+bool IS_MODEL_A_VEHICLE(Hash model)
+bool DOES_ANIM_DICT_EXIST(string animDict)
+void REQUEST_ANIM_DICT(string animDict)
+bool HAS_ANIM_DICT_LOADED(string animDict)
+void REMOVE_ANIM_DICT(string animDict)
+void REQUEST_ANIM_SET(string animSet)
+bool HAS_ANIM_SET_LOADED(string animSet)
+void REMOVE_ANIM_SET(string animSet)
+void REQUEST_IPL(string iplName)
+void REMOVE_IPL(string iplName)
+bool IS_IPL_ACTIVE(string iplName)
+bool IS_MODEL_A_BOAT(Hash model)
+bool IS_MODEL_A_JETSKI(Hash model)
+bool IS_MODEL_A_PLANE(Hash model)
+bool IS_MODEL_A_HELI(Hash model)
+bool IS_MODEL_A_CAR(Hash model)
+bool IS_MODEL_A_TRAIN(Hash model)
+bool IS_MODEL_A_BIKE(Hash model)
+bool IS_MODEL_A_BICYCLE(Hash model)
+bool IS_MODEL_A_QUAD(Hash model)
+
+CUTSCENE -
+bool IS_CUTSCENE_ACTIVE()
+bool IS_CUTSCENE_PLAYING()
+bool HAS_CUTSCENE_LOADED()
+void STOP_CUTSCENE_IMMEDIATELY()
+
+WATER -
+void MODIFY_WATER(float x, float y, float radius, float height)
+void SET_WAVES_INTENSITY(float intensity)
+float GET_WAVES_INTENSITY()
+void RESET_WAVES_INTENSITY()
+
+AUDIO -
+void PLAY_SOUND(int soundId, string audioName, string audioRef, bool p3, Any p4, bool p5)
+void PLAY_SOUND_FRONTEND(int soundId, string audioName, string audioRef, bool p3)
+void PLAY_SOUND_FROM_ENTITY(int soundId, string audioName, Entity entity, string audioRef, bool isNetwork, Any p5)
+void PLAY_SOUND_FROM_COORD(int soundId, string audioName, float x, float y, float z, string audioRef, bool isNetwork, int range, bool p8)
+void STOP_SOUND(int soundId)
+void PLAY_PAIN(Ped ped, int painID, int p1, Any p3)
+void SET_PED_IS_DRUNK(Ped ped, bool toggle)
+string GET_PLAYER_RADIO_STATION_NAME()
+string GET_RADIO_STATION_NAME(int radioStation)
+void FREEZE_RADIO_STATION(string radioStation)
+void UNFREEZE_RADIO_STATION(string radioStation)
+void SKIP_RADIO_FORWARD()
+void SET_RADIO_TRACK(string radioStation, string radioTrack)
+void SET_RADIO_STATION_IS_VISIBLE(string radioStation, bool toggle)
+
+INTERIOR -
+Interior GET_INTERIOR_AT_COORDS_WITH_TYPE(float x, float y, float z, string interiorType)
+void ACTIVATE_INTERIOR_PROP(Interior interior, string entitySetName)
+void DEACTIVATE_INTERIOR_PROP(Interior interior, string entitySetName)
+bool IS_INTERIOR_PROP_ACTIVE(Interior interior, string entitySetName)
+Interior GET_INTERIOR_FROM_ENTITY(Entity entity)
+void REFRESH_INTERIOR(Interior interior)
+
+TASK -
+void TASK_COMBAT_PED(Ped ped, Ped targetPed, int p2, int p3)
+void TASK_WANDER_STANDARD(Ped ped, float p1, int p2)
+void TASK_VEHICLE_DRIVE_WANDER(Ped ped, Vehicle vehicle, float speed, int drivingStyle)
+void TASK_START_SCENARIO_IN_PLACE(Ped ped, string scenarioName, int unkDelay, bool playEnterAnim)
+void TASK_START_SCENARIO_AT_POSITION(Ped ped, string scenarioName, float x, float y, float z, float heading, int duration, bool sittingScenario, bool teleport)
+void TASK_STAND_GUARD(Ped ped, float x, float y, float z, float heading, string scenarioName)
+void PLAY_ANIM_ON_RUNNING_SCENARIO(Ped ped, string animDict, string animName)
+bool DOES_SCENARIO_GROUP_EXIST(string scenarioGroup)
+bool IS_SCENARIO_GROUP_ENABLED(string scenarioGroup)
+void SET_SCENARIO_GROUP_ENABLED(string scenarioGroup, bool p1)
+void RESET_SCENARIO_GROUPS_ENABLED()
+void SET_EXCLUSIVE_SCENARIO_GROUP(string scenarioGroup)
+void RESET_EXCLUSIVE_SCENARIO_GROUP()
+bool IS_SCENARIO_TYPE_ENABLED(string scenarioType)
+void SET_SCENARIO_TYPE_ENABLED(string scenarioType, bool toggle)
+void RESET_SCENARIO_TYPES_ENABLED()
+bool IS_PED_ACTIVE_IN_SCENARIO(Ped ped)
+void TASK_FOLLOW_TO_OFFSET_OF_ENTITY(Ped ped, Entity entity, float offsetX, float offsetY, float offsetZ, float movementSpeed, int timeout, float stoppingRange, bool persistFollowing)
+void TASK_GO_STRAIGHT_TO_COORD(Ped ped, float x, float y, float z, float speed, int timeout, float targetHeading, float distanceToSlide)
+void TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(Ped ped, Vehicle vehicle, float x, float y, float z, float speed, int driveMode, float stopRange)
+void TASK_SHOOT_AT_ENTITY(Entity entity, Entity target, int duration, Hash firingPattern)
+void TASK_VEHICLE_ESCORT(Ped ped, Vehicle vehicle, Vehicle targetVehicle, int mode, float speed, int drivingStyle, float minDistance, int p7, float noRoadsDistance)
+void TASK_VEHICLE_FOLLOW(Ped driver, Vehicle vehicle, Entity targetEntity, float speed, int drivingStyle, int minDistance)
+void TASK_VEHICLE_DRIVE_TO_COORD(Ped ped, Vehicle vehicle, float x, float y, float z, float speed, Any p6, Hash vehicleModel, int drivingMode, float stopRange, float p10)
+void TASK_VEHICLE_SHOOT_AT_PED(Ped ped, Ped target, float p2)
+void TASK_VEHICLE_AIM_AT_PED(Ped ped, Ped target)
+void TASK_VEHICLE_SHOOT_AT_COORD(Ped ped, float x, float y, float z, float p4)
+void TASK_VEHICLE_AIM_AT_COORD(Ped ped, float x, float y, float z)
+void TASK_STAY_IN_COVER(Ped ped)
+void TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD(Ped ped, float x, float y, float z, float aimAtX, float aimAtY, float aimAtZ, float moveSpeed, bool p8, float p9, float p10, bool p11, Any flags, bool p13, Hash firingPattern)
+void TASK_GO_TO_COORD_WHILE_AIMING_AT_ENTITY(Any p0, float p1, float p2, float p3, Any p4, float p5, bool p6, float p7, float p8, bool p9, Any p10, bool p11, Any p12, Any p13)
+void TASK_GO_TO_ENTITY_WHILE_AIMING_AT_COORD(Any p0, Any p1, float p2, float p3, float p4, float p5, bool p6, float p7, float p8, bool p9, bool p10, Any p11)
+void TASK_GO_TO_ENTITY_WHILE_AIMING_AT_ENTITY(Ped ped, Entity entityToWalkTo, Entity entityToAimAt, float speed, bool shootatEntity, float p5, float p6, bool p7, bool p8, Hash firingPattern)
+void TASK_OPEN_VEHICLE_DOOR(Ped ped, Vehicle vehicle, int timeOut, int seat, float speed)
+void TASK_ENTER_VEHICLE(Ped ped, Vehicle vehicle, int timeout, int seat, float speed, int flag, Any p6)
+void TASK_LEAVE_VEHICLE(Ped ped, Vehicle vehicle, int flags)
+void TASK_SKY_DIVE(Ped ped, bool p1)
+void TASK_PARACHUTE(Ped ped, bool p1, bool p2)
+void TASK_PARACHUTE_TO_TARGET(Ped ped, float x, float y, float z)
+void SET_PARACHUTE_TASK_TARGET(Ped ped, float x, float y, float z)
+void SET_PARACHUTE_TASK_THRUST(Ped ped, float thrust)
+void TASK_RAPPEL_FROM_HELI(Ped ped, float p1)
+void TASK_VEHICLE_CHASE(Ped driver, Entity targetEnt)
+void SET_TASK_VEHICLE_CHASE_BEHAVIOR_FLAG(Ped ped, int flag, bool set)
+void SET_TASK_VEHICLE_CHASE_IDEAL_PURSUIT_DISTANCE(Ped ped, float distance)
+void TASK_SHOOT_AT_COORD(Ped ped, float x, float y, float z, int duration, Hash firingPattern)
+void TASK_AIM_GUN_AT_COORD(Ped ped, float x, float y, float z, int time, bool p5, bool p6)
+void TASK_AIM_GUN_AT_ENTITY(Ped ped, Entity entity, int duration, bool p3)
+void TASK_TURN_PED_TO_FACE_ENTITY(Ped ped, Entity entity, int duration)
+bool IS_TASK_ACTIVE(Ped ped, int taskIndex)
+void TASK_PLAY_ANIM(Ped ped, string animDictionary, string animationName, float blendInSpeed, float blendOutSpeed, int duration, int flag, float playbackRate, bool lockX, bool lockY, bool lockZ)
+void STOP_ANIM_TASK(Ped ped, string animDictionary, string animationName, float p3)
+void TASK_PLANE_MISSION(Ped pilot, Vehicle aircraft, Vehicle targetVehicle, Ped targetPed, float destinationX, float destinationY, float destinationZ, int missionFlag, float angularDrag, float unk, float targetHeading, float maxZ, float minZ, Any p13)
+void TASK_VEHICLE_MISSION_PED_TARGET(Ped ped, Vehicle vehicle, Ped pedTarget, int missionType, float maxSpeed, int drivingStyle, float minDistance, float p7, bool DriveAgainstTraffic)
+
+CONTROL - 
+bool IS_CONTROL_ENABLED(int padIndex, int control)
+bool IS_CONTROL_PRESSED(int padIndex, int control)
+bool IS_CONTROL_RELEASED(int padIndex, int control)
+bool IS_CONTROL_JUST_PRESSED(int padIndex, int control)
+bool IS_CONTROL_JUST_RELEASED(int padIndex, int control)
+float GET_CONTROL_NORMAL(int padIndex, int control)
+bool IS_DISABLED_CONTROL_PRESSED(int padIndex, int control)
+bool IS_DISABLED_CONTROL_RELEASED(int padIndex, int control)
+bool IS_DISABLED_CONTROL_JUST_PRESSED(int padIndex, int control)
+bool IS_DISABLED_CONTROL_JUST_RELEASED(int padIndex, int control)
+void DISABLE_CONTROL_ACTION(int padIndex, int control, bool disable)
+void ENABLE_CONTROL_ACTION(int padIndex, int control, bool enable)
+void DISABLE_ALL_CONTROL_ACTIONS(int padIndex)
+void ENABLE_ALL_CONTROL_ACTIONS(int padIndex)
+bool SET_CONTROL_NORMAL(int padIndex, int control, float amount)
+
+NETWORK -
+void SET_ENTITY_EXISTS_ON_ALL_MACHINES(Entity entity, bool toggle)
+int GET_NET_OBJECT_ID(Entity entity)
+bool NETSHOP_TRANSFER_BANK_TO_WALLET(int charSlot, int amount)
+bool NETSHOP_TRANSFER_WALLET_TO_BANK(int charSlot, int amount)
+bool NETSHOP_TRANSFER_CASH_SET_TELEMETRY_NONCE_SEED()
+bool NETSHOP_CHECKOUT_START(int transactionId)
+int NETSHOP_BEGIN_SERVICE(Hash categoryHash, Hash itemHash, Hash actionTypeHash, int value, int flags)
+string SC_GET_NICKNAME()
+void NETWORK_SUPPRESS_INVITE(bool toggle)
+void NETWORK_BLOCK_INVITES(bool toggle)
+bool NETWORK_GET_THIS_SCRIPT_IS_NETWORK_SCRIPT()
+string NETWORK_PLAYER_GET_NAME(Player player)
+bool NETWORK_PLAYER_IS_ROCKSTAR_DEV(Player player)
+bool NETWORK_PLAYER_INDEX_IS_CHEATER(Player player)
+void NETWORK_FADE_IN_ENTITY(Entity entity, bool state, Any p2)
+void NETWORK_FADE_OUT_ENTITY(Entity entity, bool normal, bool slow)
+string GET_ONLINE_VERSION()
+bool NETWORK_IS_HOST()
+void NETWORK_SESSION_KICK_PLAYER(Player player)
+bool TRIGGER_SCRIPT_CRC_CHECK_ON_PLAYER(Player player, int p1, Hash scriptHash)
+void SET_THIS_SCRIPT_IS_NETWORK_SCRIPT(int maxNumMissionParticipants, bool p1, int instanceId)
+bool REQUEST_CONTROL_OF_ENTITY(Entity entity)
+bool HAS_CONTROL_OF_ENTITY(Entity entity)
+bool IS_SESSION_STARTED()
+Hash NETWORK_HASH_FROM_PLAYER(Player player)
+int NETWORK_GET_MAX_FRIENDS()
+int NETWORK_GET_FRIEND_COUNT()
+bool NETWORK_IS_FRIEND_ONLINE(string name)
+bool NETWORK_IS_FRIEND_IN_MULTIPLAYER(string friendName)
+string NETWORK_GET_FRIEND_NAME(int friendIndex)
+bool NETWORK_IS_FRIEND_INDEX_ONLINE(int friendIndex)
+void NETWORK_SET_PLAYER_IS_PASSIVE(bool toggle)
+int GET_FRIEND_SCID(string name)
+bool IS_SCID_FRIEND(int scid)
+void SEND_CHAT_MESSAGE(string message, bool team)
+void SEND_CHAT_MESSAGE_AS(Player player, string message, bool team)
+bool IS_MULTIPLAYER_CHAT_ACTIVE()
+void CLOSE_MULTIPLAYER_CHAT()
+void NETWORK_SET_IN_SPECTATOR_MODE(bool toggle, Ped playerPed)
+bool NETWORK_IS_PLAYER_CONNECTED(Player player)
+void MIGRATE_SCRIPT_HOST()
+void MIGRATE_SCRIPT_HOST(string script)
+int NETWORK_GET_NETWORK_ID_FROM_ENTITY(Entity entity)
+void SET_NETWORK_ID_CAN_MIGRATE(int netId, bool toggle)
+
+OBJECT -
+Hash GET_PICKUP_HASH_FROM_WEAPON(Hash weaponHash)
+Hash GET_WEAPON_TYPE_FROM_PICKUP_TYPE(Hash pickupHash)
+Object GET_CLOSEST_OBJECT_OF_TYPE(float x, float y, float z, float radius, Hash modelHash, bool isMission, bool p6, bool p7)
+Object CREATE_OBJECT(Hash modelHash, float x, float y, float z, bool isNetwork, bool bScriptHostObj, bool dynamic)
+OBJECT.CREATE_WORLD_OBJECT(Hash modelHash, float x, float y, float z, bool isNetwork, bool dynamic)
+Pickup CREATE_AMBIENT_PICKUP(Hash pickupHash, float posX, float posY, float posZ, int flags, int value, Hash modelHash, bool p7, bool p8)
+
+ENTITY -
+bool DOES_ENTITY_EXIST(Entity entity)
+vec3 GET_ENTITY_COORDS(Entity entity)
+void SET_ENTITY_COORDS_NO_OFFSET(Entity entity, float xPos, float yPos, float zPos)
+vec3 GET_ENTITY_ROTATION(Entity entity, int rotationOrder)
+void SET_ENTITY_ROTATION(Entity entity, float pitch, float roll, float yaw, int rotationOrder, bool p5)
+void SET_ENTITY_HEADING(Entity entity, float heading)
+void SET_ENTITY_VELOCITY(Entity entity, float x, float y, float z)
+vec3 GET_ENTITY_VELOCITY(Entity entity)
+bool IS_AN_ENTITY(int handle)
+bool IS_ENTITY_A_PED(Entity entity)
+bool IS_ENTITY_A_MISSION_ENTITY(Entity entity)
+bool IS_ENTITY_A_VEHICLE(Entity entity)
+bool IS_ENTITY_AN_OBJECT(Entity entity)
+bool IS_ENTITY_DEAD(Entity entity)
+bool IS_ENTITY_ON_FIRE(Entity entity)
+bool IS_ENTITY_VISIBLE(Entity entity)
+bool IS_ENTITY_ATTACHED(Entity entity)
+void SET_ENTITY_VISIBLE(Entity entity, bool toggle, bool unk)
+int GET_ENTITY_TYPE(Entity entity)
+void SET_ENTITY_GRAVITY(Entity entity, bool toggle)
+void APPLY_FORCE_TO_ENTITY(Entity entity, int forceFlags, float x, float y, float z, float offX, float offY, float offZ, int boneIndex, bool isDirectionRel, bool ignoreUpVec, bool isForceRel, bool p12, bool p13)
+Entity GET_ENTITY_ATTACHED_TO(Entity entity)
+void DELETE_ENTITY(Entity entity)
+void DETACH_ENTITY(Entity entity, bool dynamic, bool collision)
+Hash GET_ENTITY_MODEL(Entity entity)
+float GET_ENTITY_HEADING(Entity entity)
+void ATTACH_ENTITY_TO_ENTITY(Entity entity1, Entity entity2, int boneIndex, float xPos, float yPos, float zPos, float xRot, float yRot, float zRot, bool p9, bool useSoftPinning, bool collision, bool isPed, int vertexIndex, bool fixedRot)
+void SET_ENTITY_AS_MISSION_ENTITY(Entity entity, bool p1, bool p2)
+void SET_ENTITY_COLLISION(Entity entity, bool toggle, bool keepPhysics)
+bool IS_ENTITY_IN_AIR(Entity entity)
+void SET_ENTITY_AS_NO_LONGER_NEEDED(Entity entity)
+void FREEZE_ENTITY(Entity entity, bool toggle)
+vec3 GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(Entity entity, float offsetX, float offsetY, float offsetZ)
+void SET_ENTITY_ALPHA(Entity entity, int alphaLevel, bool skin)
+void RESET_ENTITY_ALPHA(Entity entity)
+void SET_ENTITY_INVINCIBLE(Entity entity, bool toggle)
+bool IS_ENTITY_IN_WATER(Entity entity)
+float GET_ENTITY_SPEED(Entity entity)
+void SET_ENTITY_LIGHTS(Entity entity, bool toggle)
+void SET_ENTITY_MAX_SPEED(Entity entity, float speed)
+float GET_ENTITY_PITCH(Entity entity)
+float GET_ENTITY_ROLL(Entity entity)
+float GET_ENTITY_PHYSICS_HEADING(Entity entity)
+bool DOES_ENTITY_HAVE_PHYSICS(Entity entity)
+vec3 GET_ENTITY_ROTATION_VELOCITY(Entity entity)
+float GET_ENTITY_SUBMERGED_LEVEL(Entity entity)
+int GET_ENTITY_POPULATION_TYPE(Entity entity)
+bool IS_ENTITY_STATIC(Entity entity)
+bool IS_ENTITY_IN_ZONE(Entity entity, string zone)
+bool IS_ENTITY_UPRIGHT(Entity entity, float angle)
+bool IS_ENTITY_UPSIDE_DOWN(Entity entity)
+bool HAS_ENTITY_BEEN_DAMAGED_BY_ANY_OBJECT(Entity entity)
+bool HAS_ENTITY_BEEN_DAMAGED_BY_ANY_PED(Entity entity)
+bool HAS_ENTITY_BEEN_DAMAGED_BY_ANY_VEHICLE(Entity entity)
+bool HAS_ENTITY_BEEN_DAMAGED_BY_ENTITY(Entity entity1, Entity entity2, bool p2)
+bool DOES_ENTITY_HAVE_DRAWABLE(Entity entity)
+bool HAS_ENTITY_COLLIDED_WITH_ANYTHING(Entity entity)
+int GET_ENTITY_BONE_INDEX_BY_NAME(Entity entity, string boneName)
+void APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(Entity entity, int forceType, float x, float y, float z, bool p5, bool isDirectionRel, bool isForceRel, bool p8)
+int GET_ENTITY_MAX_HEALTH(Entity entity)
+void SET_ENTITY_MAX_HEALTH(Entity entity, int value)
+vec3 GET_ENTITY_FORWARD_VECTOR(Entity entity)
+bool IS_ENTITY_ON_SCREEN(Entity entity)
+void SET_ENTITY_ANIM_CURRENT_TIME(Entity entity, string animDictionary, string animName, float time)
+void SET_ENTITY_ANIM_SPEED(Entity entity, string animDictionary, string animName, float speedMultiplier)
+void SET_ENTITY_HEALTH(Entity entity, int health, int p2)
+void SET_ENTITY_PROOFS(Entity entity, bool bulletProof, bool fireProof, bool explosionProof, bool collisionProof, bool meleeProof, bool p6, bool p7, bool drownProof)
+int GET_ENTITY_ALPHA(Entity entity)
+void CREATE_MODEL_SWAP(float x, float y, float z, float radius, Hash originalModel, Hash newModel, bool p6)
+void REMOVE_MODEL_SWAP(float x, float y, float z, float radius, Hash originalModel, Hash newModel, bool p6)
+
+VEHICLE -
+void SET_VEHICLE_TYRE_SMOKE_COLOR(Vehicle vehicle, int r, int g, int b)
+Ped GET_PED_IN_VEHICLE_SEAT(Vehicle vehicle, int seatIndex, bool p2)
+void SET_VEHICLE_IS_STOLEN(Vehicle vehicle, bool isStolen)
+string GET_MOD_TEXT_LABEL(Vehicle vehicle, int modType, int modValue)
+string GET_MOD_SLOT_NAME(Vehicle vehicle, int modType)
+string GET_LIVERY_NAME(Vehicle vehicle, int liveryIndex)
+int GET_NUM_VEHICLE_MODS(Vehicle vehicle, int modType)
+void SET_VEHICLE_MOD(Vehicle vehicle, int modType, int modIndex, bool customTires)
+int GET_VEHICLE_MOD(Vehicle vehicle, int modType)
+void SET_VEHICLE_MOD_KIT(Vehicle vehicle, int modKit)
+void SET_VEHICLE_EXTRA(Vehicle vehicle, int extraId, bool disable)
+bool DOES_EXTRA_EXIST(Vehicle vehicle, int extraId)
+bool IS_VEHICLE_EXTRA_TURNED_ON(Vehicle vehicle, int extraId)
+void TOGGLE_VEHICLE_MOD(Vehicle vehicle, int modType, bool toggle)
+bool IS_VEHICLE_A_CONVERTIBLE(Vehicle vehicle, bool p1)
+int GET_CONVERTIBLE_ROOF_STATE(Vehicle vehicle)
+void SET_CONVERTIBLE_ROOF(Vehicle vehicle, bool p1)
+void SET_VEHICLE_INDICATOR_LIGHTS(Vehicle vehicle, int turnSignal, bool toggle)
+void SET_VEHICLE_BRAKE_LIGHTS(Vehicle vehicle, bool toggle)
+void SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(Vehicle vehicle, bool state)
+void SET_VEHICLE_ENGINE_ON(Vehicle vehicle, bool value, bool instantly, bool disableAutoStart)
+void SET_VEHICLE_FIXED(Vehicle vehicle)
+void SET_VEHICLE_DEFORMATION_FIXED(Vehicle vehicle)
+void SET_VEHICLE_UNDRIVEABLE(Vehicle vehicle, bool toggle)
+bool SET_VEHICLE_ON_GROUND_PROPERLY(Vehicle vehicle, float p1)
+void SET_VEHICLE_FORWARD_SPEED(Vehicle vehicle, float speed)
+void SET_VEHICLE_NUMBER_PLATE_TEXT(Vehicle vehicle, string plateText)
+void SET_VEHICLE_DOOR_OPEN(Vehicle vehicle, int doorId, bool loose, bool openInstantly)
+void SET_VEHICLE_DOORS_SHUT(Vehicle vehicle, bool closeInstantly)
+bool IS_TOGGLE_MOD_ON(Vehicle vehicle, int modType)
+void SET_VEHICLE_WHEEL_TYPE(Vehicle vehicle, int WheelType)
+void SET_VEHICLE_NUMBER_PLATE_INDEX(Vehicle vehicle, int plateIndex)
+void SET_VEHICLE_TYRES_CAN_BURST(Vehicle vehicle, bool toggle)
+void SET_VEHICLE_TYRE_BURST(Vehicle vehicle, int index, bool onRim, float p3)
+int GET_NUM_VEHICLE_MODS(Vehicle vehicle, int modType)
+bool IS_VEHICLE_ENGINE_RUNNING(Vehicle vehicle)
+void SET_VEHICLE_ENGINE_HEALTH(Vehicle vehicle, float health)
+bool IS_VEHICLE_DAMAGED(Vehicle vehicle)
+bool IS_VEHICLE_ON_ALL_WHEELS(Vehicle vehicle)
+Vehicle CREATE_VEHICLE(Hash modelHash, float x, float y, float z, float heading, bool isNetwork, bool bScriptHostVeh, bool p7)
+void SET_VEHICLE_DOORS_LOCKED(Vehicle vehicle, int doorLockStatus)
+void SET_VEHICLE_NEON_LIGHT_ENABLED(Vehicle vehicle, int index, bool toggle)
+bool IS_VEHICLE_NEON_LIGHT_ENABLED(Vehicle vehicle, int index)
+void SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(float multiplier)
+void SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(float multiplier)
+void SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(float multiplier)
+void SET_AMBIENT_VEHICLE_RANGE_MULTIPLIER_THIS_FRAME(float value)
+bool IS_VEHICLE_ROCKET_BOOST_ACTIVE(Vehicle vehicle)
+void SET_VEHICLE_ROCKET_BOOST_ACTIVE(Vehicle vehicle, bool active)
+void SET_VEHICLE_ROCKET_BOOST_PERCENTAGE(Vehicle vehicle, float percentage)
+void SET_VEHICLE_ROCKET_BOOST_REFILL_TIME(Vehicle vehicle, float seconds)
+void CONTROL_LANDING_GEAR(Vehicle vehicle, int state)
+int GET_LANDING_GEAR_STATE(Vehicle vehicle)
+void SET_VEHICLE_LIVERY(Vehicle vehicle, int livery)
+int GET_VEHICLE_LIVERY(Vehicle vehicle)
+bool IS_VEHICLE_STOPPED(Vehicle vehicle)
+int GET_VEHICLE_NUMBER_OF_PASSENGERS(Vehicle vehicle)
+int GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(Vehicle vehicle)
+int GET_VEHICLE_MODEL_NUMBER_OF_SEATS(Hash modelHash)
+int GET_VEHICLE_LIVERY_COUNT(Vehicle vehicle)
+int GET_VEHICLE_ROOF_LIVERY_COUNT(Vehicle vehicle)
+bool IS_VEHICLE_MODEL(Vehicle vehicle, Hash model)
+bool IS_VEHICLE_STUCK_ON_ROOF(Vehicle vehicle)
+void SET_VEHICLE_DOORS_LOCKED_FOR_PLAYER(Vehicle vehicle, Player player, bool toggle)
+bool GET_VEHICLE_DOORS_LOCKED_FOR_PLAYER(Vehicle vehicle, Player player)
+void SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(Vehicle vehicle, bool toggle)
+void SET_VEHICLE_DOORS_LOCKED_FOR_NON_SCRIPT_PLAYERS(Vehicle vehicle, bool toggle)
+void SET_VEHICLE_DOORS_LOCKED_FOR_TEAM(Vehicle vehicle, int team, bool toggle)
+void EXPLODE_VEHICLE(Vehicle vehicle, bool isAudible, bool isInvisible, bool p3)
+void SET_VEHICLE_OUT_OF_CONTROL(Vehicle vehicle, bool killDriver, bool explodeOnImpact)
+void SET_VEHICLE_TIMED_EXPLOSION(Vehicle vehicle, Ped ped, bool toggle)
+void ADD_VEHICLE_PHONE_EXPLOSIVE_DEVICE(Vehicle vehicle)
+bool HAS_VEHICLE_PHONE_EXPLOSIVE_DEVICE()
+void DETONATE_VEHICLE_PHONE_EXPLOSIVE_DEVICE()
+void SET_TAXI_LIGHTS(Vehicle vehicle, bool state)
+bool IS_TAXI_LIGHT_ON(Vehicle vehicle)
+void SET_VEHICLE_COLOURS(Vehicle vehicle, int colorPrimary, int colorSecondary)
+void SET_VEHICLE_EXTRA_COLOURS(Vehicle vehicle, int pearlescentColor, int wheelColor)
+void SET_VEHICLE_FULLBEAM(Vehicle vehicle, bool toggle)
+void SET_VEHICLE_CUSTOM_PRIMARY_COLOUR(Vehicle vehicle, int r, int g, int b)
+void CLEAR_VEHICLE_CUSTOM_PRIMARY_COLOUR(Vehicle vehicle)
+bool GET_IS_VEHICLE_PRIMARY_COLOUR_CUSTOM(Vehicle vehicle)
+void SET_VEHICLE_CUSTOM_SECONDARY_COLOUR(Vehicle vehicle, int r, int g, int b)
+void CLEAR_VEHICLE_CUSTOM_SECONDARY_COLOUR(Vehicle vehicle)
+bool GET_IS_VEHICLE_SECONDARY_COLOUR_CUSTOM(Vehicle vehicle)
+string GET_LIVERY_NAME(Vehicle vehicle, int liveryIndex)
+void SET_VEHICLE_WINDOW_TINT(Vehicle vehicle, int tint)
+int GET_VEHICLE_WINDOW_TINT(Vehicle vehicle)
+void MODIFY_VEHICLE_TOP_SPEED(Vehicle vehicle, float value)
+void SET_HELI_BLADES_FULL_SPEED(Vehicle vehicle)
+void SET_HELI_BLADES_SPEED(Vehicle vehicle, float speed)
+void SET_VEHICLE_PARACHUTE_ACTIVE(Vehicle vehicle, bool active)
+bool DOES_VEHICLE_HAVE_PARACHUTE(Vehicle vehicle)
+bool CAN_VEHICLE_PARACHUTE_BE_ACTIVATED(Vehicle vehicle)
+void SET_VEHICLE_CAN_BE_LOCKED_ON(Vehicle vehicle, bool canBeLockedOn, bool unk)
+void SET_VEHICLE_HAS_BEEN_OWNED_BY_PLAYER(Vehicle vehicle, bool owned)
+void SET_VEHICLE_STEER_BIAS(Vehicle vehicle, float value)
+void SET_VEHICLE_REDUCE_GRIP(Vehicle vehicle, bool toggle)
+float GET_VEHICLE_ESTIMATED_MAX_SPEED(Vehicle vehicle)
+void SET_VEHICLE_TYRE_FIXED(Vehicle vehicle, int tyreIndex)
+int GET_VEHICLE_CLASS(Vehicle vehicle)
+void ATTACH_VEHICLE_TO_CARGOBOB(Vehicle vehicle, Vehicle cargobob, int p2, float x, float y, float z)
+void SET_CARGOBOB_PICKUP_MAGNET_ACTIVE(Vehicle cargobob, bool isActive)
+void SET_CARGOBOB_PICKUP_MAGNET_STRENGTH(Vehicle cargobob, float strength)
+void DETACH_VEHICLE_FROM_CARGOBOB(Vehicle vehicle, Vehicle cargobob)
+void SET_VEHICLE_XENON_LIGHTS_COLOR(Vehicle vehicle, int colorIndex)
+void SET_VEHICLE_NEON_LIGHTS_COLOR(Vehicle vehicle, int r, int g, int b)
+int GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(Vehicle vehicle)
+STRING GET_VEHICLE_NUMBER_PLATE_TEXT(Vehicle vehicle)
+void SET_VEHICLE_SIREN(Vehicle vehicle, bool toggle)
+bool IS_VEHICLE_SIREN_ON(Vehicle vehicle)
+bool IS_VEHICLE_SIREN_AUDIO_ON(Vehicle vehicle)
+void SET_VEHICLE_STRONG(Vehicle vehicle, bool toggle)
+void REMOVE_VEHICLE_WINDOW(Vehicle vehicle, int windowIndex)
+void SET_VEHICLE_LIGHT_MULTIPLIER(Vehicle vehicle, float multiplier)
+void DELETE_ALL_TRAINS()
+Vehicle GET_RANDOM_VEHICLE_IN_SPHERE(float x, float y, float z, float radius, Hash modelHash, int flags)
+void SET_VEHICLE_DAMAGE(Vehicle vehicle, float xOffset, float yOffset, float zOffset, float damage, float radius, bool focusOnModel)
+float GET_VEHICLE_ENGINE_HEALTH(Vehicle vehicle)
+void SET_VEHICLE_ENGINE_HEALTH(Vehicle vehicle, float health)
+bool IS_VEHICLE_DRIVEABLE(Vehicle vehicle, bool isOnFireCheck)
+void START_VEHICLE_HORN(Vehicle vehicle, int duration, Hash mode, bool forever)
+
+WEAPON -
+void GIVE_DELAYED_WEAPON_TO_PED(Ped ped, Hash weaponHash, int ammoCount, bool bForceInHand)
+int GET_WEAPON_TINT_COUNT(Hash weaponHash)
+int GET_PED_WEAPON_TINT_INDEX(Ped ped, Hash weaponHash)
+void SET_PED_WEAPON_TINT_INDEX(Ped ped, Hash weaponHash, int tintIndex)
+void GIVE_WEAPON_COMPONENT_TO_PED(Ped ped, Hash weaponHash, Hash componentHash)
+void REMOVE_WEAPON_COMPONENT_FROM_PED(Ped ped, Hash weaponHash, Hash componentHash)
+void REMOVE_ALL_PED_WEAPONS(Ped ped, bool p1)
+void REMOVE_WEAPON_FROM_PED(Ped ped, Hash weaponHash)
+void SET_PED_AMMO(Ped ped, Hash weaponHash, int ammo)
+bool HAS_PED_GOT_WEAPON_COMPONENT(Ped ped, Hash weaponHash, Hash componentHash)
+Hash GET_PED_AMMO_TYPE_FROM_WEAPON(Ped ped, Hash weaponHash)
+void SET_PED_AMMO_BY_TYPE(Ped ped, Hash ammoTypeHash, int ammo)
+bool HAS_PED_GOT_WEAPON(Ped ped, Hash weaponHash)
+int GET_MAX_AMMO(Ped ped, Hash weaponHash)
+int GET_AMMO_IN_PED_WEAPON(Ped ped, Hash weaponhash)
+bool IS_PED_WEAPON_READY_TO_SHOOT(Ped ped)
+bool IS_PED_ARMED(Ped ped, int typeFlags)
+bool IS_WEAPON_VALID(Hash weaponHash)
+
+SCRIPT -
+int START_NEW_SCRIPT(string scriptName, int stackSize)
+Player GET_HOST_OF_THIS_SCRIPT()
+float GET_GLOBAL_F(int global)
+int GET_GLOBAL_I(int global)
+void SET_GLOBAL_F(int global, float value)
+void SET_GLOBAL_I(int global, int value)
+float GET_LOCAL_F(Hash script, int local)
+int GET_LOCAL_I(Hash script, int local)
+void SET_LOCAL_F(Hash script, int local, float value)
+void SET_LOCAL_I(Hash script, int local, int value)
+
+PED -
+int GET_GROUP_SIZE(int group)
+Hash GET_CURRENT_PED_WEAPON(Ped ped)
+vec3 GET_PED_LAST_WEAPON_IMPACT(Ped ped)
+bool IS_PED_IN_ANY_VEHICLE(Ped ped)
+void SET_GROUP_FORMATION(int groupId, int formationType)
+void SET_PED_AS_GROUP_MEMBER(Ped ped, int groupId)
+int GET_PED_GROUP_INDEX(Ped ped)
+int GET_PED_HEALTH(Ped ped)
+void SET_PED_HEALTH(Ped ped, int health)
+bool IS_PED_RAGDOLL(Ped ped)
+bool IS_PED_A_PLAYER(Ped ped)
+void SET_PED_INTO_VEHICLE(Ped ped, Vehicle vehicle, int seatIndex)
+int GET_PED_DRAWABLE_VARIATION(Ped ped, int componentId)
+int GET_PED_TEXTURE_VARIATION(Ped ped, int componentId)
+int GET_PED_PROP_INDEX(Ped ped, int componentId)
+int GET_PED_PROP_TEXTURE_INDEX(Ped ped, int componentId)
+void SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId)
+void SET_PED_PROP_INDEX(Ped ped, int componentId, int drawableId, int TextureId, bool attach)
+void SET_PED_CAN_SWITCH_WEAPON(Ped ped, bool toggle)
+bool IS_PED_SHOOTING(Ped ped)
+int GET_PED_BONE_INDEX(Ped ped, int boneId)
+vec3 GET_PED_BONE_COORDS(Ped ped, int boneId, float offsetX, float offsetY, float offsetZ)
+Hash GET_PED_RELATIONSHIP_GROUP_HASH(Ped ped)
+void SET_PED_RELATIONSHIP_GROUP_HASH(Ped ped, Hash hash)
+Vehicle GET_VEHICLE_PED_IS_USING(Ped ped)
+void CLEAR_ALL_PED_PROPS(Ped ped)
+void CLEAR_PED_TASKS_IMMEDIATELY(Ped ped)
+void CLEAR_PED_BLOOD_DAMAGE(Ped ped)
+bool IS_PED_IN_VEHICLE(Ped ped, Vehicle vehicle, bool atGetIn)
+bool IS_PED_USING_ANY_SCENARIO(Ped ped)
+bool SET_PED_TO_RAGDOLL(Ped ped, int time1, int time2, int ragdollType)
+void SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(Ped ped, bool toggle)
+bool CAN_PED_RAGDOLL(Ped ped)
+void SET_PED_COMBAT_ABILITY(Ped ped, int abilityLevel)
+void SET_PED_MAX_HEALTH(Ped ped, int value)
+int GET_PED_MAX_HEALTH(Ped ped)
+void RESURRECT_PED(Ped ped)
+void SET_PED_COMBAT_MOVEMENT(Ped ped, int combatMovement)
+void SET_PED_COMBAT_RANGE(Ped ped, int combatRange)
+void SET_PED_COMBAT_ATTRIBUTES(Ped ped, int attributeId, bool enabled)
+void SET_PED_ACCURACY(Ped ped, int accuracy)
+Ped CREATE_PED(int pedType, Hash modelHash, float x, float y, float z, float heading, bool isNetwork, bool bScriptHostPed)
+int GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS(Ped ped, int componentId)
+int GET_NUMBER_OF_PED_TEXTURE_VARIATIONS(Ped ped, int componentId, int drawableId)
+int GET_NUMBER_OF_PED_PROP_DRAWABLE_VARIATIONS(Ped ped, int propId)
+int GET_NUMBER_OF_PED_PROP_TEXTURE_VARIATIONS(Ped ped, int propId, int drawableId)
+void SET_PED_RANDOM_COMPONENT_VARIATION(Ped ped, int p1)
+void SET_PED_DEFAULT_COMPONENT_VARIATION(Ped ped)
+void SET_PED_MOVEMENT_CLIPSET(Ped ped, string clipSet, float transitionSpeed)
+void RESET_PED_MOVEMENT_CLIPSET(Ped ped, float p1)
+Ped CLONE_PED(Ped ped)
+void SET_PED_CONFIG_FLAG(Ped ped, int flagId, bool value)
+void SET_PED_DENSITY_MULTIPLIER_THIS_FRAME(float multiplier)
+void SET_SCENARIO_PED_DENSITY_MULTIPLIER_THIS_FRAME(float p0, float p1)
+int CREATE_GROUP(int unused)
+void REMOVE_GROUP(int groupId)
+void SET_PED_AS_GROUP_LEADER(Ped ped, int groupId)
+void REMOVE_PED_FROM_GROUP(Ped ped)
+bool IS_PED_GROUP_MEMBER(Ped ped, int groupId)
+void SET_GROUP_FORMATION_SPACING(int groupId, float p1, float p2, float p3)
+void RESET_GROUP_FORMATION_DEFAULT_SPACING(int groupHandle)
+void SET_PED_NEVER_LEAVES_GROUP(Ped ped, bool toggle)
+bool DOES_GROUP_EXIST(int groupId)
+bool IS_PED_IN_GROUP(Ped ped)
+void SET_CREATE_RANDOM_COPS(bool toggle)
+bool CAN_CREATE_RANDOM_COPS()
+bool IS_PED_SWIMMING(Ped ped)
+bool IS_PED_SWIMMING_UNDERWATER(Ped ped)
+void CLEAR_RELATIONSHIP_BETWEEN_GROUPS(Hash group1, Hash group2)
+void SET_RELATIONSHIP_BETWEEN_GROUPS(int relationship, Hash group1, Hash group2)
+void SET_PED_HEAD_BLEND_DATA(Ped ped, int shapeFirstID, int shapeSecondID, int shapeThirdID, int skinFirstID, int skinSecondID, int skinThirdID, float shapeMix, float skinMix, float thirdMix, bool isParent)
+void SET_PED_FACE_FEATURE(Ped ped, int index, float scale)
+int GET_PED_EYE_COLOR(Ped ped)
+void SET_PED_EYE_COLOR(Ped ped, int index)
+void SET_PED_HEAD_OVERLAY(Ped ped, int overlayID, int index, float opacity)
+int GET_PED_HEAD_OVERLAY_VALUE(Ped ped, int overlayID)
+void SET_PED_HEAD_OVERLAY_COLOR(Ped ped, int overlayID, int colorType, int colorID, int secondColorID)
+int GET_PED_ARMOR(Ped ped)
+void SET_PED_ARMOR(Ped ped, int amount)
+void SET_PED_FLEE_ATTRIBUTES(Ped ped, int attributeFlags, bool enable)
+void SET_PED_AS_ENEMY(Ped ped, bool toggle)
+Vehicle GET_VEHICLE_PED_IS_IN(Ped ped, bool includeLastVehicle)
+bool IS_PED_MODEL(Ped ped, Hash modelHash)
+Ped CREATE_RANDOM_PED(float posX, float posY, float posZ)
+bool IS_PED_ON_VEHICLE(Ped ped)
+bool IS_PED_IN_COMBAT(Ped ped, Ped target)
+Entity GET_PED_SOURCE_OF_DEATH(Ped ped)
+void SET_PED_FIRING_PATTERN(Ped ped, Hash patternHash)
+void SET_PED_SHOOT_RATE(Ped ped, int shootRate)
+void APPLY_DAMAGE_TO_PED(Ped ped, int damageAmount, bool p2, Any p3)
+int GET_PED_TYPE(Ped ped)
+void SET_PED_HAIR_COLOR(Ped ped, int colorID, int highlightColorID)
+
+MISC -
+bool FILE_EXISTS(string path)
+bool DIR_EXISTS(string path)
+void MAKE_DIR(string path)
+string GET_APPDATA_PATH(string dir, string file)
+string FROM_CLIPBOARD()
+void TO_CLIPBOARD(string str)
+int TIME()
+int TIME_MS()
+
+GAMEPLAY -
+void TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME(string scriptName)
+void SET_FAKE_WANTED_LEVEL(int fakeWantedLevel)
+bool IS_BIT_SET(int address, int offset)
+void CANCEL_STUNT_JUMP()
+bool IS_STUNT_JUMP_IN_PROGRESS()
+void SET_STUNT_JUMPS_CAN_TRIGGER(bool toggle)
+void SET_GRAVITY_LEVEL(int level)
+void SET_PLAYER_IS_IN_ANIMAL_FORM(bool toggle)
+bool GET_IS_PLAYER_IN_ANIMAL_FORM()
+void SET_BIT(int address, int offset)
+void CLEAR_BIT(int address, int offset)
+bool IS_DLC_PRESENT(Hash dlcHash)
+void SET_BLACKOUT(bool toggle)
+int GET_GAME_STATE()
+bool IS_GAME_STATE(int state)
+float GET_GROUND_Z(float x, float y)
+bool IS_ONSCREEN_KEYBOARD_ACTIVE()
+Hash GET_HASH_KEY(string string)
+void DISPLAY_ONSCREEN_KEYBOARD(string windowTitle, string defaultText, int maxInputLength)
+int UPDATE_ONSCREEN_KEYBOARD()
+string GET_ONSCREEN_KEYBOARD_RESULT()
+void SET_OVERRIDE_WEATHER(string weatherType)
+void CLEAR_OVERRIDE_WEATHER()
+void SET_MOBILE_RADIO(bool toggle)
+void CLEAR_AREA_OF_VEHICLES(float x, float y, float z, float radius, bool p4, bool p5, bool p6, bool p7, bool p8, bool p9)
+void CLEAR_AREA_OF_OBJECTS(float x, float y, float z, float radius, int flags)
+void CLEAR_AREA_OF_PEDS(float x, float y, float z, float radius, int flags)
+void CLEAR_AREA_OF_COPS(float x, float y, float z, float radius, int flags)
+void CLEAR_AREA_OF_PROJECTILES(float x, float y, float z, float radius, int flags)
+void _SET_CLOUD_HAT_OPACITY(float opacity)
+float _GET_CLOUD_HAT_OPACITY()
+void PRELOAD_CLOUD_HAT(string name)
+void _CLEAR_CLOUD_HAT()
+void LOAD_CLOUD_HAT(string name, float transitionTime)
+void UNLOAD_CLOUD_HAT(string name, float p1)
+float GET_FRAME_TIME()
+int GET_FRAME_COUNT()
+void SHOOT_SINGLE_BULLET_BETWEEN_COORDS(float x1, float y1, float z1, float x2, float y2, float z2, int damage, bool p7, Hash weaponHash, Ped ownerPed, bool isAudible, bool isInvisible, float speed)
+
+UI -
+int GET_WAYPOINT_BLIP_ENUM_ID()
+Blip GET_FIRST_BLIP_INFO_ID(int blipSprite)
+bool DOES_BLIP_EXIST(Blip blip)
+Blip GET_NEXT_BLIP_INFO_ID(int blipSprite)
+int GET_BLIP_INFO_ID_TYPE(Blip blip)
+vec3 GET_BLIP_INFO_ID_COORD(Blip blip)
+void BEGIN_TEXT_COMMAND_DISPLAY_TEXT(string text)
+void ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(string text)
+void END_TEXT_COMMAND_DISPLAY_TEXT(float x, float y, int p2)
+void DRAW_TEXT(string text, float x, float y, float width, float height, int red, int green, int blue, int alpha, int font, bool centered, bool rightAligned, bool outline)
+Blip GET_BLIP_FROM_ENTITY(Entity entity)
+Blip ADD_BLIP_FOR_ENTITY(Entity entity)
+void SET_BLIP_SPRITE(Blip blip, int spriteId)
+void SET_BLIP_COLOUR(Blip blip, int color)
+void HIDE_HUD_COMPONENT_THIS_FRAME(int id)
+void HIDE_HUD_AND_RADAR_THIS_FRAME()
+string GET_LABEL_TEXT(string labelName)
+void DRAW_RECT(float x, float y, float width, float height, int r, int g, int b, int a, bool p8)
+void DRAW_LINE(float x1, float y1, float z1, float x2, float y2, float z2, int red, int green, int blue, int alpha)
+void SET_TEXT_SCALE(float scale, float size)
+void SET_TEXT_COLOUR(int red, int green, int blue, int alpha)
+void SET_TEXT_FONT(int fontType)
+void SET_TEXT_WRAP(float start, float end)
+void SET_TEXT_OUTLINE()
+void SET_TEXT_CENTRE(bool align)
+void SET_TEXT_RIGHT_JUSTIFY(bool toggle)
+void SET_TEXT_JUSTIFICATION(int justifyType)
+void SET_NEW_WAYPOINT(float x, float y)
+bool IS_HUD_COMPONENT_ACTIVE(int id)
+void SHOW_HUD_COMPONENT_THIS_FRAME(int id)
+void SET_WAYPOINT_OFF()
+void SET_BLIP_AS_MISSION_CREATOR_BLIP(Blip blip, bool toggle)
+bool IS_MISSION_CREATOR_BLIP(Blip blip)
+Blip ADD_BLIP_FOR_RADIUS(float posX, float posY, float posZ, float radius)
+Blip ADD_BLIP_FOR_PICKUP(Pickup pickup)
+Blip ADD_BLIP_FOR_COORD(float x, float y, float z)
+void SET_BLIP_COORD(Blip blip, float posX, float posY, float posZ)
+vec3 GET_BLIP_COORDS(Blip blip)
+void REMOVE_BLIP(Blip blip)
+void SET_BLIP_ROUTE(Blip blip, bool enabled)
+void SET_BLIP_ROUTE_COLOUR(Blip blip, int colour)
+int GET_WAYPOINT_BLIP_ENUM_ID()
+Blip GET_FIRST_BLIP_INFO_ID(int blipSprite)
+BOOL DOES_BLIP_EXIST(Blip blip)
+Blip GET_NEXT_BLIP_INFO_ID(int blipSprite)
+int GET_BLIP_INFO_ID_TYPE(Blip blip)
+vec3 GET_BLIP_INFO_ID_COORD(Blip blip)
+
+GRAPHICS -
+void REQUEST_NAMED_PTFX_ASSET(string fxName)
+bool HAS_NAMED_PTFX_ASSET_LOADED(string fxName)
+void REMOVE_NAMED_PTFX_ASSET(string fxName)
+void USE_PARTICLE_FX_ASSET(string name)
+int START_PARTICLE_FX_LOOPED_ON_ENTITY(string effectName, Entity entity, float xOffset, float yOffset, float zOffset, float xRot, float yRot, float zRot, float scale, bool xAxis, bool yAxis, bool zAxis)
+bool START_PARTICLE_FX_NON_LOOPED_ON_ENTITY(string effectName, Entity entity, float offsetX, float offsetY, float offsetZ, float rotX, float rotY, float rotZ, float scale, bool axisX, bool axisY, bool axisZ)
+int START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY(string effectName, Entity entity, float xOffset, float yOffset, float zOffset, float xRot, float yRot, float zRot, float scale, bool xAxis, bool yAxis, bool zAxis, Any p12, Any p13, Any p14, Any p15)
+bool START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_ENTITY(string effectName, Entity entity, float offsetX, float offsetY, float offsetZ, float rotX, float rotY, float rotZ, float scale, bool axisX, bool axisY, bool axisZ)
+int START_PARTICLE_FX_LOOPED_AT_COORD(string effectName, float x, float y, float z, float xRot, float yRot, float zRot, float scale, bool xAxis, bool yAxis, bool zAxis, bool p11)
+int START_PARTICLE_FX_NON_LOOPED_AT_COORD(string effectName, float xPos, float yPos, float zPos, float xRot, float yRot, float zRot, float scale, bool xAxis, bool yAxis, bool zAxis)
+bool START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(string effectName, float xPos, float yPos, float zPos, float xRot, float yRot, float zRot, float scale, bool xAxis, bool yAxis, bool zAxis, bool p11)
+void REMOVE_PARTICLE_FX(int ptfxHandle, bool p1)
+void REMOVE_PARTICLE_FX_IN_RANGE(float X, float Y, float Z, float radius)
+void SET_PARTICLE_FX_LOOPED_OFFSETS(int ptfxHandle, float x, float y, float z, float rotX, float rotY, float rotZ)
+void SET_PARTICLE_FX_LOOPED_EVOLUTION(int ptfxHandle, string propertyName, float amount, bool noNetwork)
+void SET_PARTICLE_FX_LOOPED_COLOUR(int ptfxHandle, float r, float g, float b, bool p4)
+void SET_PARTICLE_FX_LOOPED_ALPHA(int ptfxHandle, float alpha)
+void SET_PARTICLE_FX_LOOPED_SCALE(int ptfxHandle, float scale)
+void SET_PARTICLE_FX_LOOPED_FAR_CLIP_DIST(int ptfxHandle, float range)
+void ENABLE_CLOWN_BLOOD_VFX(bool toggle)
+void ENABLE_ALIEN_BLOOD_VFX(bool toggle)
+void ANIMPOSTFX_PLAY(string effectName, int duration, bool looped)
+void ANIMPOSTFX_STOP(string effectName)
+bool ANIMPOSTFX_IS_RUNNING(string effectName)
+void ANIMPOSTFX_STOP_ALL()
+int REQUEST_SCALEFORM_MOVIE(string scaleformName)
+bool BEGIN_SCALEFORM_MOVIE_METHOD(int scaleform, string methodName)
+void SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(string string)
+void SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(int value)
+void SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(float value)
+void SCALEFORM_MOVIE_METHOD_ADD_PARAM_BOOL(bool value)
+void DRAW_SCALEFORM_MOVIE_FULLSCREEN(int scaleform, int red, int green, int blue, int alpha, int unk)
+void DRAW_SCALEFORM_MOVIE(int scaleformHandle, float x, float y, float width, float height, int red, int green, int blue, int alpha, int unk)
+void END_SCALEFORM_MOVIE_METHOD()
+void DRAW_MARKER(int type, float posX, float posY, float posZ, float dirX, float dirY, float dirZ, float rotX, float rotY, float rotZ, float scaleX, float scaleY, float scaleZ, int red, int green, int blue, int alpha, bool bobUpAndDown, bool faceCamera, int p19, bool rotate, string textureDict, string textureName, bool drawOnEnts)
+int CREATE_CHECKPOINT(int type, float posX1, float posY1, float posZ1, float posX2, float posY2, float posZ2, float diameter, int red, int green, int blue, int alpha, int reserved)
+void SET_CHECKPOINT_ICON_HEIGHT(int checkpoint, float scale)
+void SET_CHECKPOINT_CYLINDER_HEIGHT(int checkpoint, float nearHeight, float farHeight, float radius)
+void SET_CHECKPOINT_RGBA(int checkpoint, int red, int green, int blue, int alpha)
+void DELETE_CHECKPOINT(int checkpoint)
+bool HAS_SCALEFORM_MOVIE_LOADED(int scaleformHandle)
+void SET_SCALEFORM_MOVIE_AS_NO_LONGER_NEEDED(int scaleform)
+
+MOBILE -
+void CREATE_MOBILE_PHONE(int phoneType)
+void DESTROY_MOBILE_PHONE()
+void SET_MOBILE_PHONE_SCALE(float scale)
+void SET_MOBILE_PHONE_POSITION(float posX, float posY, float posZ)
+vec3 GET_MOBILE_PHONE_POSITION()
